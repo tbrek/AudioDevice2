@@ -13,7 +13,9 @@ import CoreAudio
 class AudioDeviceController: NSObject {
     private var menu: NSMenu!
     private var statusItem: NSStatusItem!
-
+    let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    var title = "Start"
+    
     override init() {
         super.init()
         self.setupItems()
@@ -31,34 +33,27 @@ class AudioDeviceController: NSObject {
             return menu
         }()
         self.statusItem = {
-            let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+//            let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
             item.image = #imageLiteral(resourceName: "StatusItem")
             item.target = self
             item.menu = self.menu
+            item.title = title
             return item
         }()
     }
 
-    @objc func updateMenu() {
-        self.menu = {
-            let menu = NSMenu()
-            menu.delegate = self
-            return menu
-        }()
-        self.statusItem = {
-            let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-            item.image = #imageLiteral(resourceName: "StatusItem")
-            item.target = self
-            item.title = "Updated"
-            item.menu = self.menu
-            return item
-        }()
+    func updateMenu() {
+            title = "Fuck you"
+        
+        NSLog(title)
+        setupItems()
         NSLog("update menu called")
     }
     
     @objc func reloadMenu() {
         let listener = AudioDeviceListener.shared
         self.menu.removeAllItems()
+        menu.title = "updated"
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("OutputDevices", comment: "")))
         listener.devices.forEach { (device) in
             guard device.type == .output else {
