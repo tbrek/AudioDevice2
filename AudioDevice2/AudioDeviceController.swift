@@ -14,7 +14,7 @@ class AudioDeviceController: NSObject {
     private var menu: NSMenu!
     private var statusItem: NSStatusItem!
     let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-    var title = "Start"
+    var temporaryName = "Start"
     
     override init() {
         super.init()
@@ -37,23 +37,36 @@ class AudioDeviceController: NSObject {
             item.image = #imageLiteral(resourceName: "StatusItem")
             item.target = self
             item.menu = self.menu
-            item.title = title
             return item
         }()
+        reloadMenu()
     }
 
     func updateMenu() {
-            title = "Fuck you"
-        
-        NSLog(title)
-        setupItems()
         NSLog("update menu called")
+        temporaryName = "updated"
+        reloadMenu()
+        
     }
     
     @objc func reloadMenu() {
+        NSLog("reloaded")
+        self.menu = {
+            let menu = NSMenu()
+            menu.delegate = self
+            return menu
+        }()
+        self.statusItem = {
+            //            let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+            item.image = #imageLiteral(resourceName: "StatusItem")
+            item.title = temporaryName
+            item.target = self
+            item.menu = self.menu
+            return item
+        }()
         let listener = AudioDeviceListener.shared
+        
         self.menu.removeAllItems()
-        menu.title = "updated"
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("OutputDevices", comment: "")))
         listener.devices.forEach { (device) in
             guard device.type == .output else {
