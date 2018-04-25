@@ -56,7 +56,6 @@ struct AudioAddress {
 struct AudioListener {
     static var devices: AudioObjectPropertyListenerProc = {_, _, _, _ in
         NotificationCenter.post(AudioDeviceNotification: .audioDevicesDidChange)
-        NSLog("something changed")
         return 0
     }
 
@@ -74,53 +73,53 @@ struct AudioListener {
 class AudioDeviceListener {
     static let shared = AudioDeviceListener()
 
-    var devices: [AudioDevice] {
-        let objectID = AudioObjectID(kAudioObjectSystemObject)
-        var address = AudioAddress.devices
-        var size = UInt32(0)
-        AudioObjectGetPropertyDataSize(objectID, &address, 0, nil, &size)
-        var deviceIDs: [AudioDeviceID] = {
-            var deviceIDs = [AudioDeviceID]()
-            for _ in 0..<Int(size) / MemoryLayout<AudioDeviceID>.size {
-                deviceIDs.append(AudioDeviceID())
-            }
-            return deviceIDs
-        }()
-        AudioObjectGetPropertyData(objectID, &address, 0, nil, &size, &deviceIDs)
-        let devices: [AudioDevice] = {
-            var devices = [AudioDevice]()
-            for id in deviceIDs {
-                let name: String = {
-                    var name: CFString = "" as CFString
-                    var address = AudioAddress.deviceName
-                    var size = UInt32(0)
-                    AudioObjectGetPropertyDataSize(id, &address, 0, nil, &size)
-                    AudioObjectGetPropertyData(id, &address, 0, nil, &size, &name)
-                    return name as String
-                }()
-                let type: AudioDeviceType = {
-                    var address = AudioAddress.streamConfiguration
-                    var size = UInt32(0)
-                    AudioObjectGetPropertyDataSize(id, &address, 0, nil, &size)
-                    let bufferList = AudioBufferList.allocate(maximumBuffers: Int(size))
-                    AudioObjectGetPropertyData(id, &address, 0, nil, &size, bufferList.unsafeMutablePointer)
-                    let channelCount: Int = {
-                        var count = 0
-                        for index in 0 ..< Int(bufferList.unsafeMutablePointer.pointee.mNumberBuffers) {
-                            count += Int(bufferList[index].mNumberChannels)
-                        }
-                        return count
-                    }()
-                    free(bufferList.unsafeMutablePointer)
-                    return (channelCount > 0) ? .input : .output
-                }()
-                let device = AudioDevice(type: type, id: id, name: name, selected: true)
-                devices.append(device)
-            }
-            return devices
-        }()
-        return devices
-    }
+//    var devices: [AudioDevice] {
+//        let objectID = AudioObjectID(kAudioObjectSystemObject)
+//        var address = AudioAddress.devices
+//        var size = UInt32(0)
+//        AudioObjectGetPropertyDataSize(objectID, &address, 0, nil, &size)
+//        var deviceIDs: [AudioDeviceID] = {
+//            var deviceIDs = [AudioDeviceID]()
+//            for _ in 0..<Int(size) / MemoryLayout<AudioDeviceID>.size {
+//                deviceIDs.append(AudioDeviceID())
+//            }
+//            return deviceIDs
+//        }()
+//        AudioObjectGetPropertyData(objectID, &address, 0, nil, &size, &deviceIDs)
+//        let devices: [AudioDevice] = {
+//            var devices = [AudioDevice]()
+//            for id in deviceIDs {
+//                let name: String = {
+//                    var name: CFString = "" as CFString
+//                    var address = AudioAddress.deviceName
+//                    var size = UInt32(0)
+//                    AudioObjectGetPropertyDataSize(id, &address, 0, nil, &size)
+//                    AudioObjectGetPropertyData(id, &address, 0, nil, &size, &name)
+//                    return name as String
+//                }()
+//                let type: AudioDeviceType = {
+//                    var address = AudioAddress.streamConfiguration
+//                    var size = UInt32(0)
+//                    AudioObjectGetPropertyDataSize(id, &address, 0, nil, &size)
+//                    let bufferList = AudioBufferList.allocate(maximumBuffers: Int(size))
+//                    AudioObjectGetPropertyData(id, &address, 0, nil, &size, bufferList.unsafeMutablePointer)
+//                    let channelCount: Int = {
+//                        var count = 0
+//                        for index in 0 ..< Int(bufferList.unsafeMutablePointer.pointee.mNumberBuffers) {
+//                            count += Int(bufferList[index].mNumberChannels)
+//                        }
+//                        return count
+//                    }()
+//                    free(bufferList.unsafeMutablePointer)
+//                    return (channelCount > 0) ? .input : .output
+//                }()
+//                let device = AudioDevice(type: type, id: id, name: name, selected: true)
+//                devices.append(device)
+//            }
+//            return devices
+//        }()
+//        return devices
+//    }
 
     var selectedOutputDeviceID: AudioDeviceID? {
         didSet {
@@ -168,32 +167,20 @@ class AudioDeviceListener {
     // MARK: Notification handler
     @objc private func handleNotification(_ notification: Notification) {
         if notification.name == AudioDeviceNotification.audioDevicesDidChange.notificationName {
-            if !self.devices.contains(where: {$0.id == self.selectedOutputDeviceID}) {
-                self.selectedOutputDeviceID = nil
-            }
-            if !self.devices.contains(where: {$0.id == self.selectedInputDeviceID}) {
-                self.selectedInputDeviceID = nil
-            }
+            NSLog("Something has changed")
         } else if notification.name == AudioDeviceNotification.audioOutputDeviceDidChange.notificationName {
-            
-            guard var deviceID = self.selectedOutputDeviceID else {
-                return
-            }
-            self.setOutputDevice(id: &deviceID)
+           NSLog("Output has changed")
         } else if notification.name == AudioDeviceNotification.audioInputDeviceDidChange.notificationName {
-            guard var deviceID = self.selectedInputDeviceID else {
-                return
-            }
-            self.setInputDevice(id: &deviceID)
+           NSLog("Input has changed")
         }
     }
 
     private func setOutputDevice(id: inout AudioDeviceID) {
-        AudioObjectSetPropertyData(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.outputDevice, 0, nil, UInt32(MemoryLayout<AudioDeviceID>.size), &id)
+//        AudioObjectSetPropertyData(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.outputDevice, 0, nil, UInt32(MemoryLayout<AudioDeviceID>.size), &id)
         
     }
 
     private func setInputDevice(id: inout AudioDeviceID) {
-        AudioObjectSetPropertyData(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.inputDevice, 0, nil, UInt32(MemoryLayout<AudioDeviceID>.size), &id)
+//        AudioObjectSetPropertyData(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.inputDevice, 0, nil, UInt32(MemoryLayout<AudioDeviceID>.size), &id)
     }
 }
