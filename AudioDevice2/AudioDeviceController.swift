@@ -2,24 +2,26 @@
 //  AudioDeviceController.swift
 //  AudioSwitcher
 //
-//  Created by Sunnyyoung on 2017/8/2.
-//  Copyright © 2017年 Sunnyyoung. All rights reserved.
-//
+
 
 import Cocoa
 import CoreServices
 import CoreAudio
 
+var temporaryName = "Start"
+var counter = 0
+
 class AudioDeviceController: NSObject {
-    private var menu: NSMenu!
+    var menu: NSMenu!
     private var statusItem: NSStatusItem!
-    let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-    var temporaryName = "Start"
+    
     
     override init() {
         super.init()
         self.setupItems()
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
+        NotificationCenter.addObserver(observer: self, selector: #selector(outputChanged), name: .audioOutputDeviceDidChange)
+        NotificationCenter.addObserver(observer: self, selector: #selector(inputChanged), name: .audioInputDeviceDidChange)
     }
 
     deinit {
@@ -33,39 +35,27 @@ class AudioDeviceController: NSObject {
             return menu
         }()
         self.statusItem = {
-//            let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+            let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
             item.image = #imageLiteral(resourceName: "StatusItem")
             item.target = self
             item.menu = self.menu
+            item.title = temporaryName
             return item
         }()
-        reloadMenu()
     }
 
-    func updateMenu() {
-        NSLog("update menu called")
-        temporaryName = "updated"
+    @objc func outputChanged() {
+        temporaryName = "Output"
         reloadMenu()
-        
+    }
+    
+    @objc func inputChanged() {
+        temporaryName = "Input"
+        reloadMenu()
     }
     
     @objc func reloadMenu() {
-        NSLog("reloaded")
-        self.menu = {
-            let menu = NSMenu()
-            menu.delegate = self
-            return menu
-        }()
-        self.statusItem = {
-            //            let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-            item.image = #imageLiteral(resourceName: "StatusItem")
-            item.title = temporaryName
-            item.target = self
-            item.menu = self.menu
-            return item
-        }()
         let listener = AudioDeviceListener.shared
-        
         self.menu.removeAllItems()
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("OutputDevices", comment: "")))
         listener.devices.forEach { (device) in
@@ -94,6 +84,7 @@ class AudioDeviceController: NSObject {
         }
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
+//        statusItem.title = temporaryName
         self.menu.update()
     }
 
@@ -121,6 +112,8 @@ class AudioDeviceController: NSObject {
 
 extension AudioDeviceController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
+        temporaryName = "Kliknąłem"
         self.reloadMenu()
     }
 }
+

@@ -2,7 +2,6 @@
 //  AudioDeviceListener.swift
 //  AudioSwitcher
 //
-//  Created by Sunnyyoung on 2017/8/3.
 //  Copyright © 2018 Tom Brek. All rights reserved.
 //
 
@@ -33,6 +32,7 @@ struct AudioDevice {
     var type: AudioDeviceType
     var id: AudioDeviceID
     var name: String
+    var selected: Bool
 }
 
 struct AudioAddress {
@@ -62,14 +62,11 @@ struct AudioListener {
 
     static var output: AudioObjectPropertyListenerProc = {_, _, _, _ in
         NotificationCenter.post(AudioDeviceNotification: .audioOutputDeviceDidChange)
-        NSLog("Output changed")
-        AudioDeviceController().updateMenu()
         return 0
     }
 
     static var input: AudioObjectPropertyListenerProc = {_, _, _, _ in
         NotificationCenter.post(AudioDeviceNotification: .audioInputDeviceDidChange)
-        NSLog("Input changed")
         return 0
     }
 }
@@ -117,7 +114,7 @@ class AudioDeviceListener {
                     free(bufferList.unsafeMutablePointer)
                     return (channelCount > 0) ? .input : .output
                 }()
-                let device = AudioDevice(type: type, id: id, name: name)
+                let device = AudioDevice(type: type, id: id, name: name, selected: true)
                 devices.append(device)
             }
             return devices
@@ -178,6 +175,7 @@ class AudioDeviceListener {
                 self.selectedInputDeviceID = nil
             }
         } else if notification.name == AudioDeviceNotification.audioOutputDeviceDidChange.notificationName {
+            
             guard var deviceID = self.selectedOutputDeviceID else {
                 return
             }

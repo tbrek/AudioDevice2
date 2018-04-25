@@ -2,9 +2,6 @@
 //  NSMenuItem+Extension.swift
 //  AudioDevice
 //
-//  Created by Sunnyyoung on 2017/8/2.
-//  Copyright © 2017年 Sunnyyoung. All rights reserved.
-//
 
 import Cocoa
 
