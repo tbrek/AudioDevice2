@@ -14,6 +14,8 @@ var trimmed1: String!
 var trimmed2: String!
 var currentOutputDevice: String!
 var currentInputDevice: String!
+var inputsArray: [String]!
+var outputsArray: [String]!
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
@@ -63,18 +65,50 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func getCurrentInput() {
-        let task2 = Process()
-        task2.launchPath = "/Applications/AudioDevice.app/Contents/Resources/audiodevice"
-        task2.arguments = ["input"]
-        let pipe2 = Pipe()
-        task2.standardOutput = pipe2
-        task2.standardError = pipe2
-        task2.launch()
-        task2.waitUntilExit()
-        let data2 = pipe2.fileHandleForReading.readDataToEndOfFile()
-        let input: String = NSString(data: data2, encoding: String.Encoding.utf8.rawValue)! as String
+        let task = Process()
+        task.launchPath = "/Applications/AudioDevice.app/Contents/Resources/audiodevice"
+        task.arguments = ["input"]
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = pipe
+        task.launch()
+        task.waitUntilExit()
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let input: String = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
         trimmed2 = input.replacingOccurrences(of: "\n", with: "") as String
         currentInputDevice = trimmed2 as String
+    }
+    
+    @objc func getInputs() {
+        let task = Process()
+        task.launchPath = "/Applications/AudioDevice.app/Contents/Resources/audiodevice"
+        task.arguments = ["input", "list"]
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = pipe
+        task.launch()
+        task.waitUntilExit()
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        var inputs: String = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
+        inputs = String(inputs.dropLast())
+        inputsArray = inputs.components(separatedBy: ["\n"])
+        print(inputsArray)
+    }
+    
+    @objc func getOutputs() {
+        let task = Process()
+        task.launchPath = "/Applications/AudioDevice.app/Contents/Resources/audiodevice"
+        task.arguments = ["output", "list"]
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = pipe
+        task.launch()
+        task.waitUntilExit()
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        var outputs: String = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
+        outputs = String(outputs.dropLast())
+        outputsArray = outputs.components(separatedBy: ["\n"])
+        print(outputsArray)
     }
     
     @objc func updateMenu() {
@@ -88,7 +122,7 @@ class AudioDeviceController: NSObject {
         combination.append(inputDevice)
         self.statusItem.attributedTitle = combination
         var iconTemp = currentOutputDevice
-        if iconTemp?.range(of: "BT") != nil {
+        if ((iconTemp?.range(of: "BT") != nil) || (iconTemp?.range(of: "Bose") != nil)) {
             iconTemp = "BT"
         }
         switch iconTemp {
@@ -117,58 +151,63 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func reloadMenu() {
+        getCurrentInput()
+        getCurrentOutput()
+        getInputs()
+        getOutputs()
         self.menu.removeAllItems()
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Output Device:", comment: "")))
+        outputsArray.forEach { device in
+            self.menu.addItem({
+                let item = NSMenuItem(title: device, target: self, action: #selector(selectOutputDeviceAction(_:)))
+                item.state = currentOutputDevice == device ? .on : .off
+                return item
+                }())
+        }
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Input Device:", comment: "")))
+        inputsArray.forEach { device in
+            self.menu.addItem({
+                let item = NSMenuItem(title: device, target: self, action: #selector(reloadMenu))
+                item.state = currentInputDevice == device ? .on : .off
+                return item
+                }())
+        }
+        self.menu.addItem(NSMenuItem.separator())
+        self.menu.addItem(NSMenuItem(title: "Sound Preferences...", target: self, action: #selector(openSoundPreferences(_:))))
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
         updateMenu()
         
     }
     
-//        let listener = AudioDeviceListener.shared
-//        self.menu.removeAllItems()
-//        self.menu.addItem(NSMenuItem(title: NSLocalizedString("OutputDevices", comment: "")))
-//        listener.devices.forEach { (device) in
-//            guard device.type == .output else {
-//                return
-//            }
-//            self.menu.addItem({
-//                let item = NSMenuItem(title: device.name, target: self, action: #selector(selectOutputDeviceAction(_:)))
-//                item.tag = Int(device.id)
-//                item.state = listener.selectedOutputDeviceID == device.id ? .on : .off
-//                return item
-//                }())
-//        }
-//        self.menu.addItem(NSMenuItem.separator())
-//        self.menu.addItem(NSMenuItem(title: NSLocalizedString("InputDevices", comment: "")))
-//        listener.devices.forEach { (device) in
-//            guard device.type == .input else {
-//                return
-//            }
-//            self.menu.addItem({
-//                let item = NSMenuItem(title: device.name, target: self, action: #selector(selectInputDeviceAction(_:)))
-//                item.tag = Int(device.id)
-//                item.state = listener.selectedInputDeviceID == device.id ? .on : .off
-//                return item
-//            }())
-//        }
-//        self.menu.addItem(NSMenuItem.separator())
-//        self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
-////        statusItem.title = temporaryName
-//        self.menu.update()
+    @objc func selectOutputDeviceAction(_ sender: NSMenuItem) {
+        NSLog("changing")
+//        let task = Process()
+//        task.launchPath = "~/Downloads/Audiodevice/audiodevice"
+//        task.arguments = ["output", device]
+//        let pipe = Pipe()
+//        task.standardOutput = pipe
+//        task.standardError = pipe
+//        task.launch()
+//        task.waitUntilExit()
+    }
+
+    @objc func selectInputDeviceAction(_ sender: NSMenuItem) {
+//        let task = Process()
+//        task.launchPath = "~/Downloads/Audiodevice/audiodevice"
+//        task.arguments = ["input", newInputDevice]
+//        let pipe = Pipe()
+//        task.standardOutput = pipe
+//        task.standardError = pipe
+//        task.launch()
+//        task.waitUntilExit()
+    }
+
+    @objc func openSoundPreferences(_ sender: Any) {
+        NSWorkspace.shared.openFile("/System/Library/PreferencePanes/Sound.prefPane")
+    }
     
-
-    // MARK: Event method
-    @objc private func selectOutputDeviceAction(_ sender: NSMenuItem) {
-        
-    }
-
-    @objc private func selectInputDeviceAction(_ sender: NSMenuItem) {
-        
-    }
-
     @objc private func quitAction(_ sender: NSMenuItem) {
         NSApplication.shared.terminate(nil)
     }
