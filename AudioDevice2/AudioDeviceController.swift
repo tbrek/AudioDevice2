@@ -159,7 +159,7 @@ class AudioDeviceController: NSObject {
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Output Device:", comment: "")))
         outputsArray.forEach { device in
             self.menu.addItem({
-                let item = NSMenuItem(title: device, target: self, action: #selector(selectOutputDeviceAction(_:)))
+                let item = NSMenuItem(title: device, target: self, action: #selector(selectOutputDeviceActions(_:)), keyEquivalent: device)
                 item.state = currentOutputDevice == device ? .on : .off
                 return item
                 }())
@@ -181,8 +181,8 @@ class AudioDeviceController: NSObject {
         
     }
     
-    @objc func selectOutputDeviceAction(_ sender: NSMenuItem) {
-        NSLog("changing")
+    @objc func selectOutputDeviceActions(_ device: String) {
+        NSLog(device)
 //        let task = Process()
 //        task.launchPath = "~/Downloads/Audiodevice/audiodevice"
 //        task.arguments = ["output", device]
