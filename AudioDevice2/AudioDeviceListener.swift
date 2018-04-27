@@ -13,6 +13,7 @@ enum AudioDeviceNotification: String {
     case audioDevicesDidChange
     case audioInputDeviceDidChange
     case audioOutputDeviceDidChange
+    case systemVolumeDidChange
 
     var stringValue: String {
         return "AudioDevice" + rawValue
@@ -51,6 +52,9 @@ struct AudioAddress {
     static var streamConfiguration = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyStreamConfiguration,
                                                                 mScope: kAudioDevicePropertyScopeInput,
                                                                 mElement: kAudioObjectPropertyElementMaster)
+    static var systemVolume = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyVolumeScalar,
+                                                                mScope: kAudioDevicePropertyScopeOutput,
+                                                                mElement: kAudioObjectPropertyElementMaster)
 }
 
 struct AudioListener {
@@ -66,6 +70,12 @@ struct AudioListener {
 
     static var input: AudioObjectPropertyListenerProc = {_, _, _, _ in
         NotificationCenter.post(AudioDeviceNotification: .audioInputDeviceDidChange)
+        return 0
+    }
+    
+    static var volume: AudioObjectPropertyListenerProc = {_, _, _, _ in
+        NotificationCenter.post(AudioDeviceNotification: .systemVolumeDidChange)
+        NSLog("volume changed")
         return 0
     }
     
@@ -96,12 +106,16 @@ class AudioDeviceListener {
         NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioOutputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioInputDeviceDidChange)
+        NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .systemVolumeDidChange)
+        
     }
 
     deinit {
         NotificationCenter.removeObserver(observer: self, name: .audioDevicesDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioOutputDeviceDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
+        NotificationCenter.removeObserver(observer: self, name: .systemVolumeDidChange)
+
     }
 
     // MARK: Public method
@@ -109,12 +123,16 @@ class AudioDeviceListener {
         AudioObjectAddPropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.devices, AudioListener.devices, nil)
         AudioObjectAddPropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.outputDevice, AudioListener.output, nil)
         AudioObjectAddPropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.inputDevice, AudioListener.input, nil)
+        AudioObjectAddPropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.systemVolume, AudioListener.volume, nil)
+        
     }
 
     func stopListener() {
         AudioObjectRemovePropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.devices, AudioListener.devices, nil)
         AudioObjectRemovePropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.outputDevice, AudioListener.output, nil)
         AudioObjectRemovePropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.inputDevice, AudioListener.input, nil)
+        AudioObjectRemovePropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.systemVolume, AudioListener.volume, nil)
+
     }
 
     // MARK: Notification handler
@@ -125,6 +143,8 @@ class AudioDeviceListener {
 //           NSLog("Output has changed")
         } else if notification.name == AudioDeviceNotification.audioInputDeviceDidChange.notificationName {
 //           NSLog("Input has changed")
+        } else if notification.name == AudioDeviceNotification.systemVolumeDidChange.notificationName {
+            NSLog("Volume has changed")
         }
     }
 
