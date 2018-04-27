@@ -16,11 +16,11 @@ var currentOutputDevice: String!
 var currentInputDevice: String!
 var inputsArray: [String]!
 var outputsArray: [String]!
+let audiodevicePath = "/Applications/Audiodevice.app/Contents/Resources/audiodevice"
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
     private var statusItem: NSStatusItem!
-    
     
     override init() {
         super.init()
@@ -32,6 +32,8 @@ class AudioDeviceController: NSObject {
 
     deinit {
         NotificationCenter.removeObserver(observer: self, name: .audioDevicesDidChange)
+        NotificationCenter.removeObserver(observer: self, name: .audioOutputDeviceDidChange)
+        NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
     }
 
     private func setupItems() {
@@ -51,7 +53,7 @@ class AudioDeviceController: NSObject {
 
     @objc func getCurrentOutput() {
         let task = Process()
-        task.launchPath = "/Applications/AudioDevice.app/Contents/Resources/audiodevice"
+        task.launchPath = audiodevicePath
         task.arguments = ["output"]
         let pipe = Pipe()
         task.standardOutput = pipe
@@ -66,7 +68,7 @@ class AudioDeviceController: NSObject {
     
     @objc func getCurrentInput() {
         let task = Process()
-        task.launchPath = "/Applications/AudioDevice.app/Contents/Resources/audiodevice"
+        task.launchPath = audiodevicePath
         task.arguments = ["input"]
         let pipe = Pipe()
         task.standardOutput = pipe
@@ -81,7 +83,7 @@ class AudioDeviceController: NSObject {
     
     @objc func getInputs() {
         let task = Process()
-        task.launchPath = "/Applications/AudioDevice.app/Contents/Resources/audiodevice"
+        task.launchPath = audiodevicePath
         task.arguments = ["input", "list"]
         let pipe = Pipe()
         task.standardOutput = pipe
@@ -92,12 +94,11 @@ class AudioDeviceController: NSObject {
         var inputs: String = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
         inputs = String(inputs.dropLast())
         inputsArray = inputs.components(separatedBy: ["\n"])
-        print(inputsArray)
     }
     
     @objc func getOutputs() {
         let task = Process()
-        task.launchPath = "/Applications/AudioDevice.app/Contents/Resources/audiodevice"
+        task.launchPath = audiodevicePath
         task.arguments = ["output", "list"]
         let pipe = Pipe()
         task.standardOutput = pipe
@@ -108,7 +109,6 @@ class AudioDeviceController: NSObject {
         var outputs: String = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
         outputs = String(outputs.dropLast())
         outputsArray = outputs.components(separatedBy: ["\n"])
-        print(outputsArray)
     }
     
     @objc func updateMenu() {
@@ -156,6 +156,20 @@ class AudioDeviceController: NSObject {
         getInputs()
         getOutputs()
         self.menu.removeAllItems()
+        self.menu.addItem(NSMenuItem(title: "Volume:", target:self))
+        var volumeSliderView = NSView.self
+        let volumeSlider = NSSlider(frame:CGRect(x: 20 , y: 0, width: 190, height: 40))
+        volumeSlider.minValue = 0
+        volumeSlider.maxValue = 1
+        volumeSlider.isContinuous = true
+//        mySlider.addTarget(self, action: #selector(NSViewController.sliderValueDidChange(_:)), for: .valueChanged)
+        let item = NSMenuItem(title: "", action: #selector(reloadMenu), keyEquivalent: "")
+        
+        item.view = volumeSlider
+        menu.addItem(item)
+        
+        
+        
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Output Device:", comment: "")))
         outputsArray.forEach { device in
             self.menu.addItem({
@@ -182,27 +196,29 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func selectOutputDeviceActions(_ sender: NSMenuItem) {
-        NSLog(sender.title)
-//        let task = Process()
-//        task.launchPath = "~/Downloads/Audiodevice/audiodevice"
-//        task.arguments = ["output", device]
-//        let pipe = Pipe()
-//        task.standardOutput = pipe
-//        task.standardError = pipe
-//        task.launch()
-//        task.waitUntilExit()
+        let task = Process()
+        task.launchPath = audiodevicePath
+        task.arguments = ["output", sender.title]
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = pipe
+        task.launch()
+        task.waitUntilExit()
+        updateMenu()
+//        reloadMenu()
     }
 
     @objc func selectInputDeviceAction(_ sender: NSMenuItem) {
-        NSLog(sender.title)
-//        let task = Process()
-//        task.launchPath = "~/Downloads/Audiodevice/audiodevice"
-//        task.arguments = ["input", newInputDevice]
-//        let pipe = Pipe()
-//        task.standardOutput = pipe
-//        task.standardError = pipe
-//        task.launch()
-//        task.waitUntilExit()
+        let task = Process()
+        task.launchPath = audiodevicePath
+        task.arguments = ["input", sender.title]
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = pipe
+        task.launch()
+        task.waitUntilExit()
+        updateMenu()
+//        reloadMenu()
     }
 
     @objc func openSoundPreferences(_ sender: Any) {
@@ -212,11 +228,68 @@ class AudioDeviceController: NSObject {
     @objc private func quitAction(_ sender: NSMenuItem) {
         NSApplication.shared.terminate(nil)
     }
+    
+    func getDeviceVolume() {
+        var propertySize = UInt32(MemoryLayout<AudioDeviceID>.size)
+        var deviceID = kAudioDeviceUnknown
+        var propertyAddress = AudioObjectPropertyAddress(
+            mSelector: AudioObjectPropertySelector(kAudioHardwarePropertyDefaultOutputDevice),
+            mScope: AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal),
+            mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
+        AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &propertyAddress, 0, nil, &propertySize, &deviceID)
+        let channelsCount = 2
+        var channels = [UInt32](repeating: 0, count: channelsCount)
+        propertySize = UInt32(MemoryLayout<UInt32>.size * channelsCount)
+        var leftLevel = Float32(-1)
+        var rigthLevel = Float32(-1)
+        propertyAddress = AudioObjectPropertyAddress(
+            mSelector: AudioObjectPropertySelector(kAudioDevicePropertyPreferredChannelsForStereo),
+            mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+            mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
+        let status = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &channels)
+        propertyAddress.mSelector = kAudioDevicePropertyVolumeScalar
+        propertySize = UInt32(MemoryLayout<Float32>.size)
+        propertyAddress.mElement = channels[0]
+        AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &leftLevel)
+        propertyAddress.mElement = channels[1]
+        AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &rigthLevel)
+        print(leftLevel, rigthLevel)
+    }
+    
+    func setDeviceVolume(leftChannelLevel: Float, rightChannelLevel: Float) {
+        var propertySize = UInt32(MemoryLayout<AudioDeviceID>.size)
+        var deviceID = kAudioDeviceUnknown
+        var propertyAddress = AudioObjectPropertyAddress(
+            mSelector: AudioObjectPropertySelector(kAudioHardwarePropertyDefaultOutputDevice),
+            mScope: AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal),
+            mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
+        AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &propertyAddress, 0, nil, &propertySize, &deviceID)
+        let channelsCount = 2
+        var channels = [UInt32](repeating: 0, count: channelsCount)
+        propertySize = UInt32(MemoryLayout<UInt32>.size * channelsCount)
+        var leftLevel = leftChannelLevel
+        var rigthLevel = rightChannelLevel
+        propertyAddress = AudioObjectPropertyAddress(
+            mSelector: AudioObjectPropertySelector(kAudioDevicePropertyPreferredChannelsForStereo),
+            mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+            mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
+        let status = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &channels)
+        propertyAddress.mSelector = kAudioDevicePropertyVolumeScalar
+        propertySize = UInt32(MemoryLayout<Float32>.size)
+        propertyAddress.mElement = channels[0]
+        AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &leftLevel)
+        propertyAddress.mElement = channels[1]
+        AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &rigthLevel)
+    }
+    
+    
+    
 }
 
 extension AudioDeviceController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
         NSLog("Click on menu")
+        getDeviceVolume()
 //        self.updateMenu()
     }
 }
