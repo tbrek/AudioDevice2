@@ -8,7 +8,7 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         AudioDeviceListener.shared.startListener()
     }
@@ -16,5 +16,4 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ aNotification: Notification) {
         AudioDeviceListener.shared.stopListener()
     }
-
 }

@@ -8,12 +8,13 @@
 import Cocoa
 import CoreServices
 import CoreAudio
+import AudioToolbox
 
 enum AudioDeviceNotification: String {
     case audioDevicesDidChange
     case audioInputDeviceDidChange
     case audioOutputDeviceDidChange
-    case systemVolumeDidChange
+    case audioVolumeDidChange
 
     var stringValue: String {
         return "AudioDevice" + rawValue
@@ -55,6 +56,7 @@ struct AudioAddress {
     static var systemVolume = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyVolumeScalar,
                                                                 mScope: kAudioDevicePropertyScopeOutput,
                                                                 mElement: kAudioObjectPropertyElementMaster)
+
 }
 
 struct AudioListener {
@@ -74,7 +76,7 @@ struct AudioListener {
     }
     
     static var volume: AudioObjectPropertyListenerProc = {_, _, _, _ in
-        NotificationCenter.post(AudioDeviceNotification: .systemVolumeDidChange)
+        NotificationCenter.post(AudioDeviceNotification: .audioVolumeDidChange)
         NSLog("volume changed")
         return 0
     }
@@ -84,29 +86,32 @@ struct AudioListener {
 class AudioDeviceListener {
     static let shared = AudioDeviceListener()
 
-    var selectedOutputDeviceID: AudioDeviceID? {
-        didSet {
-            guard var deviceID = self.selectedOutputDeviceID else {
-                return
-            }
-            self.setOutputDevice(id: &deviceID)
-        }
-    }
-    var selectedInputDeviceID: AudioDeviceID? {
-        didSet {
-            guard var deviceID = self.selectedInputDeviceID else {
-                return
-            }
-            self.setInputDevice(id: &deviceID)
-        }
-    }
+//    var selectedOutputDeviceID: AudioDeviceID? {
+//        didSet {
+//            guard var deviceID = self.selectedOutputDeviceID else {
+//                return
+//            }
+//            self.setOutputDevice(id: &deviceID)
+//        }
+//    }
+//    var selectedInputDeviceID: AudioDeviceID? {
+//        didSet {
+//            guard var deviceID = self.selectedInputDeviceID else {
+//                return
+//            }
+//            self.setInputDevice(id: &deviceID)
+//        }
+//    }
+    
+    
+    
 
     // MARK: Lifecycle
     init() {
         NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioOutputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioInputDeviceDidChange)
-        NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .systemVolumeDidChange)
+        NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioVolumeDidChange)
         
     }
 
@@ -114,7 +119,7 @@ class AudioDeviceListener {
         NotificationCenter.removeObserver(observer: self, name: .audioDevicesDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioOutputDeviceDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
-        NotificationCenter.removeObserver(observer: self, name: .systemVolumeDidChange)
+        NotificationCenter.removeObserver(observer: self, name: .audioVolumeDidChange)
 
     }
 
@@ -138,13 +143,13 @@ class AudioDeviceListener {
     // MARK: Notification handler
     @objc private func handleNotification(_ notification: Notification) {
         if notification.name == AudioDeviceNotification.audioDevicesDidChange.notificationName {
-//            NSLog("Something has changed")
+            print("Something has changed")
         } else if notification.name == AudioDeviceNotification.audioOutputDeviceDidChange.notificationName {
-//           NSLog("Output has changed")
+           print("Output has changed")
         } else if notification.name == AudioDeviceNotification.audioInputDeviceDidChange.notificationName {
-//           NSLog("Input has changed")
-        } else if notification.name == AudioDeviceNotification.systemVolumeDidChange.notificationName {
-            NSLog("Volume has changed")
+           print("Input has changed")
+        } else if notification.name == AudioDeviceNotification.audioVolumeDidChange.notificationName {
+           print("Volume has changed")
         }
     }
 

@@ -7,6 +7,7 @@
 import Cocoa
 import CoreServices
 import CoreAudio
+import CoreImage
 
 var temporaryName = "Start"
 var counter = 0
@@ -16,13 +17,17 @@ var currentOutputDevice: String!
 var currentInputDevice: String!
 var inputsArray: [String]!
 var outputsArray: [String]!
-let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 200, height: 19))
+let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 150, height: 19))
 let audiodevicePath = "/Applications/Audiodevice.app/Contents/Resources/audiodevice"
+var leftLevel = Float32(-1)
+var rightLevel = Float32(-1)
+var icon: NSImage!
 
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
     private var statusItem: NSStatusItem!
+
     
     override init() {
         super.init()
@@ -30,12 +35,15 @@ class AudioDeviceController: NSObject {
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioOutputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
+        NotificationCenter.addObserver(observer: self, selector: #selector(printVolume), name: .audioVolumeDidChange)
+        
     }
 
     deinit {
         NotificationCenter.removeObserver(observer: self, name: .audioDevicesDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioOutputDeviceDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
+        NotificationCenter.removeObserver(observer: self, name: .audioVolumeDidChange)
     }
 
     private func setupItems() {
@@ -123,33 +131,38 @@ class AudioDeviceController: NSObject {
         combination.append(outputDevice)
         combination.append(inputDevice)
         self.statusItem.attributedTitle = combination
+        updateIcon()
+    }
+        
+        
+        
+    @objc func updateIcon() {
+        getDeviceVolume()
         var iconTemp = currentOutputDevice
         if ((iconTemp?.range(of: "BT") != nil) || (iconTemp?.range(of: "Bose") != nil)) {
             iconTemp = "BT"
         }
         switch iconTemp {
         case "BT"?:
-            let icon = NSImage(named: NSImage.Name(rawValue: "Bluetooth"))
-            icon?.isTemplate = true
-            statusItem.image = icon
+            icon = NSImage(named: NSImage.Name(rawValue: "Bluetooth"))
         case "Internal Speakers"?:
-            let icon = NSImage(named: NSImage.Name(rawValue: "Internal Speakers"))
-            icon?.isTemplate = true
-            statusItem.image = icon
+            icon = NSImage(named: NSImage.Name(rawValue: "Internal Speakers"))
         case "Display Audio"?:
-            let icon = NSImage(named: NSImage.Name(rawValue: "Display Audio"))
-            icon?.isTemplate = true
-            statusItem.image = icon
+            icon = NSImage(named: NSImage.Name(rawValue: "Display Audio"))
         case "Headphones"?:
-            let icon = NSImage(named: NSImage.Name(rawValue: "Headphones"))
-            icon?.isTemplate = true
-            statusItem.image = icon
+            icon = NSImage(named: NSImage.Name(rawValue: "Headphones"))
         default:
-            statusItem.image = nil
+            icon = NSImage(named: NSImage.Name(rawValue: "Default"))
         }
+        icon?.isTemplate = true
+        let mainIcon = icon
+        let volumeIndicator = icon
+        let size = CGSize(width: (mainIcon?.size.width)! + (volumeIndicator?.size.width)!, height: (mainIcon?.size.height)!)
+        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
         
-        
-        
+        statusItem.image = icon
+      
+
     }
     
     @objc func reloadMenu() {
@@ -160,7 +173,7 @@ class AudioDeviceController: NSObject {
         self.menu.removeAllItems()
         self.menu.addItem(NSMenuItem(title: "Volume:", target:self))
         
-        let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 250, height: 19))
+        let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 170, height: 19))
         let volumeItem = NSMenuItem()
         volumeSliderView.addSubview(volumeSlider)
         volumeSlider.minValue = 0.0
@@ -169,8 +182,7 @@ class AudioDeviceController: NSObject {
         volumeSlider.target = self
         volumeSlider.action = #selector(setDeviceVolume)
         volumeItem.view = volumeSliderView
-//        volumeSlider.isContinuous = true
-//        mySlider.addTarget(self, action: #selector(NSViewController.sliderValueDidChange(_:)), for: .valueChanged)
+        volumeSlider.isContinuous = true
         self.menu.addItem(volumeItem)
         
         
@@ -244,21 +256,19 @@ class AudioDeviceController: NSObject {
         let channelsCount = 2
         var channels = [UInt32](repeating: 0, count: channelsCount)
         propertySize = UInt32(MemoryLayout<UInt32>.size * channelsCount)
-        var leftLevel = Float32(-1)
-        var rigthLevel = Float32(-1)
         propertyAddress = AudioObjectPropertyAddress(
             mSelector: AudioObjectPropertySelector(kAudioDevicePropertyPreferredChannelsForStereo),
             mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
             mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
-        let status = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &channels)
+        _ = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &channels)
         propertyAddress.mSelector = kAudioDevicePropertyVolumeScalar
         propertySize = UInt32(MemoryLayout<Float32>.size)
         propertyAddress.mElement = channels[0]
         AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &leftLevel)
         propertyAddress.mElement = channels[1]
-        AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &rigthLevel)
-        print(leftLevel, rigthLevel)
+        AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &rightLevel)
         volumeSlider.floatValue = leftLevel
+        printVolume()
     }
     
     @objc func setDeviceVolume(slider: NSSlider) {
@@ -278,17 +288,20 @@ class AudioDeviceController: NSObject {
             mSelector: AudioObjectPropertySelector(kAudioDevicePropertyPreferredChannelsForStereo),
             mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
             mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
-        let status = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &channels)
+        _ = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &channels)
         propertyAddress.mSelector = kAudioDevicePropertyVolumeScalar
         propertySize = UInt32(MemoryLayout<Float32>.size)
         propertyAddress.mElement = channels[0]
         AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &leftLevel)
         propertyAddress.mElement = channels[1]
         AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &rigthLevel)
-        print(leftLevel, rigthLevel)
-
+        printVolume()
     }
     
+    
+    @objc func printVolume() {
+        print(currentOutputDevice, leftLevel, rightLevel)
+    }
     
     
 }
@@ -296,7 +309,6 @@ class AudioDeviceController: NSObject {
 extension AudioDeviceController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
         getDeviceVolume()
-//        self.updateMenu()
     }
 }
 
