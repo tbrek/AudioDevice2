@@ -155,10 +155,6 @@ class AudioDeviceController: NSObject {
             icon = NSImage(named: NSImage.Name(rawValue: "Default"))
         }
         icon?.isTemplate = true
-        let mainIcon = icon
-        let volumeIndicator = icon
-        let size = CGSize(width: (mainIcon?.size.width)! + (volumeIndicator?.size.width)!, height: (mainIcon?.size.height)!)
-        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
         
         statusItem.image = icon
       
