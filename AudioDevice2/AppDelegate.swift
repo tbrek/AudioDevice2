@@ -17,3 +17,4 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         AudioDeviceListener.shared.stopListener()
     }
 }
+

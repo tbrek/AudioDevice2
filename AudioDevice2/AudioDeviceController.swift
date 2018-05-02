@@ -22,12 +22,16 @@ let audiodevicePath = "/Applications/Audiodevice.app/Contents/Resources/audiodev
 var leftLevel = Float32(-1)
 var rightLevel = Float32(-1)
 var icon: NSImage!
+var volumeIndicator: String!
+var volume = Float32(-1)
+var isMuted: Bool!
+var muteVal = Float32(-1)
+
 
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
     private var statusItem: NSStatusItem!
-
     
     override init() {
         super.init()
@@ -36,7 +40,7 @@ class AudioDeviceController: NSObject {
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioOutputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(printVolume), name: .audioVolumeDidChange)
-        
+         _ = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
     }
 
     deinit {
@@ -139,20 +143,27 @@ class AudioDeviceController: NSObject {
     @objc func updateIcon() {
         getDeviceVolume()
         var iconTemp = currentOutputDevice
+        volume = volumeSlider.floatValue
+        print(volume)
+        if (volume < 0.34 && volume > 0)        { volumeIndicator = "_min" }
+        if (volume > 0.34 && volume < 0.668)    { volumeIndicator = "_mid" }
+        if (volume > 0.668)                     { volumeIndicator = "_max" }
+        if (volume == 0)                        { volumeIndicator = "_muted" }
+        if isMuted == true                      { volumeIndicator = "_muted" }
         if ((iconTemp?.range(of: "BT") != nil) || (iconTemp?.range(of: "Bose") != nil)) {
             iconTemp = "BT"
         }
         switch iconTemp {
         case "BT"?:
-            icon = NSImage(named: NSImage.Name(rawValue: "Bluetooth"))
+            icon = NSImage(named: NSImage.Name(rawValue: "Bluetooth" + volumeIndicator))
         case "Internal Speakers"?:
-            icon = NSImage(named: NSImage.Name(rawValue: "Internal Speakers"))
+            icon = NSImage(named: NSImage.Name(rawValue: "Internal Speakers" + volumeIndicator))
         case "Display Audio"?:
-            icon = NSImage(named: NSImage.Name(rawValue: "Display Audio"))
+            icon = NSImage(named: NSImage.Name(rawValue: "Display Audio" + volumeIndicator))
         case "Headphones"?:
-            icon = NSImage(named: NSImage.Name(rawValue: "Headphones"))
+            icon = NSImage(named: NSImage.Name(rawValue: "Headphones" + volumeIndicator))
         default:
-            icon = NSImage(named: NSImage.Name(rawValue: "Default"))
+            icon = NSImage(named: NSImage.Name(rawValue: "Default" + volumeIndicator))
         }
         icon?.isTemplate = true
         
@@ -249,6 +260,19 @@ class AudioDeviceController: NSObject {
             mScope: AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal),
             mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
         AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &propertyAddress, 0, nil, &propertySize, &deviceID)
+        
+        propertyAddress = AudioObjectPropertyAddress(
+            mSelector: AudioObjectPropertySelector(kAudioDevicePropertyMute),
+            mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+            mElement: 0)
+        
+        AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &muteVal)
+        print(muteVal)
+        if muteVal == 0 { isMuted = false }
+        else {
+            isMuted = true
+        }
+        
         let channelsCount = 2
         var channels = [UInt32](repeating: 0, count: channelsCount)
         propertySize = UInt32(MemoryLayout<UInt32>.size * channelsCount)
@@ -264,7 +288,9 @@ class AudioDeviceController: NSObject {
         propertyAddress.mElement = channels[1]
         AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &rightLevel)
         volumeSlider.floatValue = leftLevel
-        printVolume()
+        
+        
+        
     }
     
     @objc func setDeviceVolume(slider: NSSlider) {
@@ -278,8 +304,8 @@ class AudioDeviceController: NSObject {
         let channelsCount = 2
         var channels = [UInt32](repeating: 0, count: channelsCount)
         propertySize = UInt32(MemoryLayout<UInt32>.size * channelsCount)
-        var leftLevel = slider.floatValue
-        var rigthLevel = slider.floatValue
+        leftLevel = slider.floatValue
+        rightLevel = slider.floatValue
         propertyAddress = AudioObjectPropertyAddress(
             mSelector: AudioObjectPropertySelector(kAudioDevicePropertyPreferredChannelsForStereo),
             mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
@@ -290,21 +316,19 @@ class AudioDeviceController: NSObject {
         propertyAddress.mElement = channels[0]
         AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &leftLevel)
         propertyAddress.mElement = channels[1]
-        AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &rigthLevel)
-        printVolume()
+        AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &rightLevel)
+        
     }
     
     
     @objc func printVolume() {
         print(currentOutputDevice, leftLevel, rightLevel)
     }
-    
-    
 }
 
 extension AudioDeviceController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
-        getDeviceVolume()
+//        getDeviceVolume()
     }
 }
 
