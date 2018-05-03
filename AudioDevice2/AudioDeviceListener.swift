@@ -14,8 +14,6 @@ enum AudioDeviceNotification: String {
     case audioDevicesDidChange
     case audioInputDeviceDidChange
     case audioOutputDeviceDidChange
-    case audioVolumeDidChange
-
     var stringValue: String {
         return "AudioDevice" + rawValue
     }
@@ -53,10 +51,6 @@ struct AudioAddress {
     static var streamConfiguration = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyStreamConfiguration,
                                                                 mScope: kAudioDevicePropertyScopeInput,
                                                                 mElement: kAudioObjectPropertyElementMaster)
-    static var systemVolume = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyVolumeScalar,
-                                                                mScope: kAudioDevicePropertyScopeOutput,
-                                                                mElement: kAudioObjectPropertyElementMaster)
-
 }
 
 struct AudioListener {
@@ -74,13 +68,6 @@ struct AudioListener {
         NotificationCenter.post(AudioDeviceNotification: .audioInputDeviceDidChange)
         return 0
     }
-    
-    static var volume: AudioObjectPropertyListenerProc = {_, _, _, _ in
-        NotificationCenter.post(AudioDeviceNotification: .audioVolumeDidChange)
-        NSLog("volume changed")
-        return 0
-    }
-    
 }
 
 class AudioDeviceListener {
@@ -111,16 +98,12 @@ class AudioDeviceListener {
         NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioOutputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioInputDeviceDidChange)
-        NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioVolumeDidChange)
-        
     }
 
     deinit {
         NotificationCenter.removeObserver(observer: self, name: .audioDevicesDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioOutputDeviceDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
-        NotificationCenter.removeObserver(observer: self, name: .audioVolumeDidChange)
-
     }
 
     // MARK: Public method
@@ -128,37 +111,22 @@ class AudioDeviceListener {
         AudioObjectAddPropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.devices, AudioListener.devices, nil)
         AudioObjectAddPropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.outputDevice, AudioListener.output, nil)
         AudioObjectAddPropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.inputDevice, AudioListener.input, nil)
-        AudioObjectAddPropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.systemVolume, AudioListener.volume, nil)
-        
     }
 
     func stopListener() {
         AudioObjectRemovePropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.devices, AudioListener.devices, nil)
         AudioObjectRemovePropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.outputDevice, AudioListener.output, nil)
         AudioObjectRemovePropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.inputDevice, AudioListener.input, nil)
-        AudioObjectRemovePropertyListener(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.systemVolume, AudioListener.volume, nil)
-
     }
 
     // MARK: Notification handler
     @objc private func handleNotification(_ notification: Notification) {
         if notification.name == AudioDeviceNotification.audioDevicesDidChange.notificationName {
-            print("Something has changed")
+//            print("Something has changed")
         } else if notification.name == AudioDeviceNotification.audioOutputDeviceDidChange.notificationName {
-           print("Output has changed")
+//           print("Output has changed")
         } else if notification.name == AudioDeviceNotification.audioInputDeviceDidChange.notificationName {
-           print("Input has changed")
-        } else if notification.name == AudioDeviceNotification.audioVolumeDidChange.notificationName {
-           print("Volume has changed")
+//           print("Input has changed")
         }
-    }
-
-    private func setOutputDevice(id: inout AudioDeviceID) {
-//        AudioObjectSetPropertyData(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.outputDevice, 0, nil, UInt32(MemoryLayout<AudioDeviceID>.size), &id)
-        
-    }
-
-    private func setInputDevice(id: inout AudioDeviceID) {
-//        AudioObjectSetPropertyData(AudioObjectID(kAudioObjectSystemObject), &AudioAddress.inputDevice, 0, nil, UInt32(MemoryLayout<AudioDeviceID>.size), &id)
     }
 }

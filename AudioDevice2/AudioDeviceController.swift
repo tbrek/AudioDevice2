@@ -9,8 +9,6 @@ import CoreServices
 import CoreAudio
 import CoreImage
 
-var temporaryName = "Start"
-var counter = 0
 var trimmed1: String!
 var trimmed2: String!
 var currentOutputDevice: String!
@@ -26,8 +24,10 @@ var volumeIndicator: String!
 var volume = Float32(-1)
 var isMuted: Bool!
 var muteVal = Float32(-1)
-
-
+var showInputDevice: Bool!
+var showOutputDevice: Bool!
+var timer: Timer!
+var openAtLoginSetting: Bool!
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
@@ -39,15 +39,14 @@ class AudioDeviceController: NSObject {
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioOutputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
-        NotificationCenter.addObserver(observer: self, selector: #selector(printVolume), name: .audioVolumeDidChange)
-         _ = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
     }
 
     deinit {
         NotificationCenter.removeObserver(observer: self, name: .audioDevicesDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioOutputDeviceDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
-        NotificationCenter.removeObserver(observer: self, name: .audioVolumeDidChange)
+        timer.invalidate()
     }
 
     private func setupItems() {
@@ -128,23 +127,32 @@ class AudioDeviceController: NSObject {
     @objc func updateMenu() {
         getCurrentInput()
         getCurrentOutput()
-        trimmed1 = trimmed1 + "\n"
-        let outputDevice = NSAttributedString(string: trimmed1, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
-        let inputDevice = NSAttributedString(string: trimmed2, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
-        let combination = NSMutableAttributedString()
-        combination.append(outputDevice)
-        combination.append(inputDevice)
-        self.statusItem.attributedTitle = combination
+        if ((menu.item(withTitle: "Show Output")?.state == .on) && (menu.item(withTitle: "Show Input")?.state == .on)) {
+            trimmed1 = trimmed1 + "\n"
+            let outputDevice = NSAttributedString(string: trimmed1, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
+            let inputDevice = NSAttributedString(string: trimmed2, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
+            let combination = NSMutableAttributedString()
+            combination.append(outputDevice)
+            combination.append(inputDevice)
+            self.statusItem.attributedTitle = combination
+        }
+        if ((menu.item(withTitle: "Show Output")?.state == .on) && (menu.item(withTitle: "Show Input")?.state == .off)) {
+            self.statusItem.title = currentOutputDevice
+        }
+        if ((menu.item(withTitle: "Show Output")?.state == .off) && (menu.item(withTitle: "Show Input")?.state == .on)) {
+            self.statusItem.title = currentInputDevice
+        }
+        if ((menu.item(withTitle: "Show Output")?.state == .off) && (menu.item(withTitle: "Show Input")?.state == .off)) {
+            self.statusItem.title = ""
+        }
         updateIcon()
     }
-        
-        
-        
+    
     @objc func updateIcon() {
         getDeviceVolume()
         var iconTemp = currentOutputDevice
         volume = volumeSlider.floatValue
-        print(volume)
+//        print(volume)
         if (volume < 0.34 && volume > 0)        { volumeIndicator = "_min" }
         if (volume > 0.34 && volume < 0.668)    { volumeIndicator = "_mid" }
         if (volume > 0.668)                     { volumeIndicator = "_max" }
@@ -166,10 +174,7 @@ class AudioDeviceController: NSObject {
             icon = NSImage(named: NSImage.Name(rawValue: "Default" + volumeIndicator))
         }
         icon?.isTemplate = true
-        
         statusItem.image = icon
-      
-
     }
     
     @objc func reloadMenu() {
@@ -179,7 +184,6 @@ class AudioDeviceController: NSObject {
         getOutputs()
         self.menu.removeAllItems()
         self.menu.addItem(NSMenuItem(title: "Volume:", target:self))
-        
         let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 170, height: 19))
         let volumeItem = NSMenuItem()
         volumeSliderView.addSubview(volumeSlider)
@@ -191,8 +195,6 @@ class AudioDeviceController: NSObject {
         volumeItem.view = volumeSliderView
         volumeSlider.isContinuous = true
         self.menu.addItem(volumeItem)
-        
-        
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Output Device:", comment: "")))
         outputsArray.forEach { device in
             self.menu.addItem({
@@ -213,9 +215,14 @@ class AudioDeviceController: NSObject {
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: "Sound Preferences...", target: self, action: #selector(openSoundPreferences(_:))))
         self.menu.addItem(NSMenuItem.separator())
+        self.menu.addItem(NSMenuItem(title: "Show Output", target: self, action: #selector(showOutput(_: ))))
+        menu.item(withTitle: "Show Output")?.state = showOutputDevice == true ? .on : .off
+        self.menu.addItem(NSMenuItem(title: "Show Input", target: self, action: #selector(showInput(_: ))))
+        menu.item(withTitle: "Show Input")?.state = showInputDevice == true ? .on : .off
+        self.menu.addItem(NSMenuItem(title: "Open at Login", target: self, action: #selector(openAtLogin(_: ))))
+        self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
         updateMenu()
-        
     }
     
     @objc func selectOutputDeviceActions(_ sender: NSMenuItem) {
@@ -228,7 +235,6 @@ class AudioDeviceController: NSObject {
         task.launch()
         task.waitUntilExit()
         updateMenu()
-//        reloadMenu()
     }
 
     @objc func selectInputDeviceAction(_ sender: NSMenuItem) {
@@ -241,15 +247,50 @@ class AudioDeviceController: NSObject {
         task.launch()
         task.waitUntilExit()
         updateMenu()
-//        reloadMenu()
     }
 
+    @objc func openAtLogin(_ sender: NSMenuItem) {
+        if (self.menu.item(withTitle: "Open at Login")?.state == .on) {
+            self.menu.item(withTitle: "Open at Login")?.state = .off
+            openAtLoginSetting = false
+        }
+        else {
+            self.menu.item(withTitle: "Open at Login")?.state = .on
+            openAtLoginSetting = true
+        }
+    }
+    
     @objc func openSoundPreferences(_ sender: Any) {
         NSWorkspace.shared.openFile("/System/Library/PreferencePanes/Sound.prefPane")
     }
     
     @objc private func quitAction(_ sender: NSMenuItem) {
         NSApplication.shared.terminate(nil)
+    }
+    
+    @objc private func showOutput(_ sender: NSMenuItem) {
+        if (self.menu.item(withTitle: "Show Output")?.state == .on) {
+            self.menu.item(withTitle: "Show Output")?.state = .off
+            showOutputDevice = false
+            }
+            else {
+                self.menu.item(withTitle: "Show Output")?.state = .on
+                showOutputDevice = true
+            }
+        updateMenu()
+    }
+    
+    @objc private func showInput(_ sender: NSMenuItem) {
+        if (self.menu.item(withTitle: "Show Input")?.state == .on) {
+            self.menu.item(withTitle: "Show Input")?.state = .off
+            showInputDevice = false
+            }
+            else {
+                self.menu.item(withTitle: "Show Input")?.state = .on
+                showInputDevice = true
+            }
+        
+        updateMenu()
     }
     
     func getDeviceVolume() {
@@ -260,19 +301,15 @@ class AudioDeviceController: NSObject {
             mScope: AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal),
             mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
         AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &propertyAddress, 0, nil, &propertySize, &deviceID)
-        
         propertyAddress = AudioObjectPropertyAddress(
             mSelector: AudioObjectPropertySelector(kAudioDevicePropertyMute),
             mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
             mElement: 0)
-        
         AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &muteVal)
-        print(muteVal)
         if muteVal == 0 { isMuted = false }
         else {
             isMuted = true
         }
-        
         let channelsCount = 2
         var channels = [UInt32](repeating: 0, count: channelsCount)
         propertySize = UInt32(MemoryLayout<UInt32>.size * channelsCount)
@@ -288,9 +325,7 @@ class AudioDeviceController: NSObject {
         propertyAddress.mElement = channels[1]
         AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &rightLevel)
         volumeSlider.floatValue = leftLevel
-        
-        
-        
+//        print(leftLevel, rightLevel, muteVal)
     }
     
     @objc func setDeviceVolume(slider: NSSlider) {
@@ -317,10 +352,8 @@ class AudioDeviceController: NSObject {
         AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &leftLevel)
         propertyAddress.mElement = channels[1]
         AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &rightLevel)
-        
     }
-    
-    
+
     @objc func printVolume() {
         print(currentOutputDevice, leftLevel, rightLevel)
     }
@@ -328,7 +361,7 @@ class AudioDeviceController: NSObject {
 
 extension AudioDeviceController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
-//        getDeviceVolume()
+        getDeviceVolume()
     }
 }
 
