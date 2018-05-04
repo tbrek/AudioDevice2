@@ -15,6 +15,7 @@
 		7DADF8761F347F0200BB0DF2 /* AudioDeviceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DADF8741F347F0200BB0DF2 /* AudioDeviceController.swift */; };
 		7DB6A5CA1F37081700149D6D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7DB6A5C91F37081700149D6D /* Main.storyboard */; };
 		7DB6A5D11F37090100149D6D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7DB6A5D31F37090100149D6D /* Localizable.strings */; };
+		D51ABA3F20921DE7002F53C9 /* audiodevice in Resources */ = {isa = PBXBuildFile; fileRef = D51ABA3E20921DE6002F53C9 /* audiodevice */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 		7DB6A5C91F37081700149D6D /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		7DB6A5D21F37090100149D6D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7DB6A5D41F37090200149D6D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		D51ABA3E20921DE6002F53C9 /* audiodevice */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = audiodevice; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +77,7 @@
 		7DADF86D1F347E8E00BB0DF2 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				D51ABA3E20921DE6002F53C9 /* audiodevice */,
 				7DADF8671F347E8200BB0DF2 /* Info.plist */,
 				7DB6A5D31F37090100149D6D /* Localizable.strings */,
 			);
@@ -151,6 +154,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7DB6A5CA1F37081700149D6D /* Main.storyboard in Resources */,
+				D51ABA3F20921DE7002F53C9 /* audiodevice in Resources */,
 				7DB6A5D11F37090100149D6D /* Localizable.strings in Resources */,
 				7DADF8631F347E8200BB0DF2 /* Assets.xcassets in Resources */,
 			);
@@ -303,7 +307,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = AudioDevice2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tombrek.com;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -318,7 +322,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = AudioDevice2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tombrek.com;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
