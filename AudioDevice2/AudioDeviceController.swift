@@ -35,6 +35,12 @@ class AudioDeviceController: NSObject {
     
     override init() {
         super.init()
+        let defaults = UserDefaults.standard
+//        if !(NSControl.StateValue(rawValue: defaults.integer(forKey: "showOutput"))) {
+//            print("test")
+//        }
+//        menu.item(withTitle: "Show Output")?.state = NSControl.StateValue(rawValue: defaults.integer(forKey: "showOutput"))
+//        menu.item(withTitle: "Show Input")?.state = NSControl.StateValue(rawValue: defaults.integer(forKey: "showInput"))
         self.setupItems()
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioOutputDeviceDidChange)
