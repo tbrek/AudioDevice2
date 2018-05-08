@@ -28,6 +28,7 @@ var showInputDevice: Bool!
 var showOutputDevice: Bool!
 var timer: Timer!
 var openAtLoginSetting: Bool!
+let defaults = UserDefaults.standard
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
@@ -35,12 +36,10 @@ class AudioDeviceController: NSObject {
     
     override init() {
         super.init()
-        let defaults = UserDefaults.standard
-//        if !(NSControl.StateValue(rawValue: defaults.integer(forKey: "showOutput"))) {
-//            print("test")
-//        }
-//        menu.item(withTitle: "Show Output")?.state = NSControl.StateValue(rawValue: defaults.integer(forKey: "showOutput"))
-//        menu.item(withTitle: "Show Input")?.state = NSControl.StateValue(rawValue: defaults.integer(forKey: "showInput"))
+        
+        showOutputDevice = defaults.object(forKey: "showOutputDevice") as! Bool!
+        showInputDevice  = defaults.object(forKey: "showInputDevice") as! Bool!
+        openAtLoginSetting = defaults.object(forKey: "openAtLogin") as! Bool!
         self.setupItems()
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioOutputDeviceDidChange)
@@ -264,6 +263,7 @@ class AudioDeviceController: NSObject {
             self.menu.item(withTitle: "Open at Login")?.state = .on
             openAtLoginSetting = true
         }
+        defaults.set(openAtLoginSetting, forKey: "openAtLogin")
     }
     
     @objc func openSoundPreferences(_ sender: Any) {
@@ -280,9 +280,10 @@ class AudioDeviceController: NSObject {
             showOutputDevice = false
             }
             else {
-                self.menu.item(withTitle: "Show Output")?.state = .on
-                showOutputDevice = true
+            self.menu.item(withTitle: "Show Output")?.state = .on
+            showOutputDevice = true
             }
+        defaults.set(showOutputDevice, forKey: "showOutputDevice")
         updateMenu()
     }
     
@@ -295,7 +296,7 @@ class AudioDeviceController: NSObject {
                 self.menu.item(withTitle: "Show Input")?.state = .on
                 showInputDevice = true
             }
-        
+        defaults.set(showInputDevice, forKey: "showInputDevice")
         updateMenu()
     }
     
