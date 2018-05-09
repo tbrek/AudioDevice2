@@ -16,7 +16,7 @@ var currentInputDevice: String!
 var inputsArray: [String]!
 var outputsArray: [String]!
 let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 150, height: 19))
-let audiodevicePath = "/Applications/Audiodevice.app/Contents/Resources/audiodevice"
+let audiodevicePath = "/Applications/Audiodevice2.app/Contents/Resources/audiodevice"
 var leftLevel = Float32(-1)
 var rightLevel = Float32(-1)
 var icon: NSImage!
@@ -27,7 +27,7 @@ var muteVal = Float32(-1)
 var showInputDevice: Bool!
 var showOutputDevice: Bool!
 var timer: Timer!
-var openAtLoginSetting: Bool!
+var useShortNames: Bool!
 let defaults = UserDefaults.standard
 
 class AudioDeviceController: NSObject {
@@ -39,7 +39,7 @@ class AudioDeviceController: NSObject {
         
         showOutputDevice = defaults.object(forKey: "showOutputDevice") as! Bool!
         showInputDevice  = defaults.object(forKey: "showInputDevice") as! Bool!
-        openAtLoginSetting = defaults.object(forKey: "openAtLogin") as! Bool!
+        useShortNames = defaults.object(forKey: "useShortNames") as! Bool!
         self.setupItems()
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioOutputDeviceDidChange)
@@ -132,6 +132,10 @@ class AudioDeviceController: NSObject {
     @objc func updateMenu() {
         getCurrentInput()
         getCurrentOutput()
+        if (menu.item(withTitle: "Use Short Names")?.state == .on) {
+            trimmed1 = String(trimmed1.prefix(4))
+            trimmed2 = String(trimmed2.prefix(4))
+        }
         if ((menu.item(withTitle: "Show Output")?.state == .on) && (menu.item(withTitle: "Show Input")?.state == .on)) {
             trimmed1 = trimmed1 + "\n"
             let outputDevice = NSAttributedString(string: trimmed1, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
@@ -142,10 +146,10 @@ class AudioDeviceController: NSObject {
             self.statusItem.attributedTitle = combination
         }
         if ((menu.item(withTitle: "Show Output")?.state == .on) && (menu.item(withTitle: "Show Input")?.state == .off)) {
-            self.statusItem.title = currentOutputDevice
+            self.statusItem.title = trimmed1
         }
         if ((menu.item(withTitle: "Show Output")?.state == .off) && (menu.item(withTitle: "Show Input")?.state == .on)) {
-            self.statusItem.title = currentInputDevice
+            self.statusItem.title = trimmed2
         }
         if ((menu.item(withTitle: "Show Output")?.state == .off) && (menu.item(withTitle: "Show Input")?.state == .off)) {
             self.statusItem.title = ""
@@ -224,7 +228,8 @@ class AudioDeviceController: NSObject {
         menu.item(withTitle: "Show Output")?.state = showOutputDevice == true ? .on : .off
         self.menu.addItem(NSMenuItem(title: "Show Input", target: self, action: #selector(showInput(_: ))))
         menu.item(withTitle: "Show Input")?.state = showInputDevice == true ? .on : .off
-        self.menu.addItem(NSMenuItem(title: "Open at Login", target: self, action: #selector(openAtLogin(_: ))))
+        self.menu.addItem(NSMenuItem(title: "Use Short Names", target: self, action: #selector(useShortNamesClicked(_: ))))
+        menu.item(withTitle: "Use Short Names")?.state = useShortNames == true ? .on : .off
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
         updateMenu()
@@ -254,16 +259,18 @@ class AudioDeviceController: NSObject {
         updateMenu()
     }
 
-    @objc func openAtLogin(_ sender: NSMenuItem) {
-        if (self.menu.item(withTitle: "Open at Login")?.state == .on) {
-            self.menu.item(withTitle: "Open at Login")?.state = .off
-            openAtLoginSetting = false
+    @objc func useShortNamesClicked(_ sender: NSMenuItem) {
+        if (self.menu.item(withTitle: "Use Short Names")?.state == .on) {
+            self.menu.item(withTitle: "Use Short Names")?.state = .off
+            useShortNames = false
         }
         else {
-            self.menu.item(withTitle: "Open at Login")?.state = .on
-            openAtLoginSetting = true
+            self.menu.item(withTitle: "Use Short Names")?.state = .on
+            useShortNames = true
         }
-        defaults.set(openAtLoginSetting, forKey: "openAtLogin")
+        defaults.set(useShortNames, forKey: "useShortNames")
+        updateMenu()
+        print(useShortNames)
     }
     
     @objc func openSoundPreferences(_ sender: Any) {
