@@ -36,10 +36,9 @@ class AudioDeviceController: NSObject {
     
     override init() {
         super.init()
-        
-        showOutputDevice = defaults.object(forKey: "showOutputDevice") as! Bool!
-        showInputDevice  = defaults.object(forKey: "showInputDevice") as! Bool!
-        useShortNames = defaults.object(forKey: "useShortNames") as! Bool!
+        showOutputDevice = defaults.object(forKey: "showOutputDevice") as! Bool?
+        showInputDevice  = defaults.object(forKey: "showInputDevice") as! Bool?
+        useShortNames = defaults.object(forKey: "useShortNames") as! Bool?
         self.setupItems()
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioOutputDeviceDidChange)
