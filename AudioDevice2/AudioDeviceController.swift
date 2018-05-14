@@ -160,12 +160,14 @@ class AudioDeviceController: NSObject {
         getDeviceVolume()
         var iconTemp = currentOutputDevice
         volume = volumeSlider.floatValue
-//        print(volume)
-        if (volume < 0.34 && volume > 0)        { volumeIndicator = "_min" }
-        if (volume > 0.34 && volume < 0.668)    { volumeIndicator = "_mid" }
-        if (volume > 0.668)                     { volumeIndicator = "_max" }
-        if (volume == 0)                        { volumeIndicator = "_muted" }
         if isMuted == true                      { volumeIndicator = "_muted" }
+        else {
+            if (volume < 0.25 && volume > 0)        { volumeIndicator = "_25" }
+            if (volume < 0.50 && volume > 0.25)     { volumeIndicator = "_50" }
+            if (volume < 0.75 && volume > 0.50)     { volumeIndicator = "_75" }
+            if (volume > 0.75)                      { volumeIndicator = "_100" }
+            if (volume == 0)                        { volumeIndicator = "_0" }
+        }
         if ((iconTemp?.range(of: "BT") != nil) || (iconTemp?.range(of: "Bose") != nil)) {
             iconTemp = "BT"
         }
@@ -173,7 +175,7 @@ class AudioDeviceController: NSObject {
         case "BT"?:
             icon = NSImage(named: NSImage.Name(rawValue: "Bluetooth" + volumeIndicator))
         case "Internal Speakers"?:
-            icon = NSImage(named: NSImage.Name(rawValue: "Internal Speakers" + volumeIndicator))
+            icon = NSImage(named: NSImage.Name(rawValue: "Speakers" + volumeIndicator))
         case "Display Audio"?:
             icon = NSImage(named: NSImage.Name(rawValue: "Display Audio" + volumeIndicator))
         case "Headphones"?:
