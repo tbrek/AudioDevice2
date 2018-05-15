@@ -28,6 +28,7 @@ var showInputDevice: Bool!
 var showOutputDevice: Bool!
 var timer: Timer!
 var useShortNames: Bool!
+var deviceColor: NSColor!
 let defaults = UserDefaults.standard
 
 class AudioDeviceController: NSObject {
@@ -139,10 +140,14 @@ class AudioDeviceController: NSObject {
             trimmed1 = trimmed1 + "\n"
             let outputDevice = NSAttributedString(string: trimmed1, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
             let inputDevice = NSAttributedString(string: trimmed2, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
+            
             let combination = NSMutableAttributedString()
             combination.append(outputDevice)
             combination.append(inputDevice)
+//            combination.addAttribute(NSAttributedStringKey.strikethroughStyle, value: 1, range: NSMakeRange(0, combination.length))
+//            combination.addAttribute(NSAttributedStringKey.backgroundColor, value: NSColor.red, range: NSMakeRange(0, combination.length))
             self.statusItem.attributedTitle = combination
+            
         }
         if ((menu.item(withTitle: "Show Output")?.state == .on) && (menu.item(withTitle: "Show Input")?.state == .off)) {
             self.statusItem.title = trimmed1
@@ -160,7 +165,13 @@ class AudioDeviceController: NSObject {
         getDeviceVolume()
         var iconTemp = currentOutputDevice
         volume = volumeSlider.floatValue
-        if isMuted == true                      { volumeIndicator = "_muted" }
+        if isMuted == true                      {
+            
+            
+            volumeIndicator = "_muted"
+            
+            
+        }
         else {
             if (volume < 0.25 && volume > 0)        { volumeIndicator = "_25" }
             if (volume < 0.50 && volume >= 0.25)     { volumeIndicator = "_50" }
