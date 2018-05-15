@@ -163,9 +163,9 @@ class AudioDeviceController: NSObject {
         if isMuted == true                      { volumeIndicator = "_muted" }
         else {
             if (volume < 0.25 && volume > 0)        { volumeIndicator = "_25" }
-            if (volume < 0.50 && volume > 0.25)     { volumeIndicator = "_50" }
-            if (volume < 0.75 && volume > 0.50)     { volumeIndicator = "_75" }
-            if (volume > 0.75)                      { volumeIndicator = "_100" }
+            if (volume < 0.50 && volume >= 0.25)     { volumeIndicator = "_50" }
+            if (volume < 0.75 && volume >= 0.50)     { volumeIndicator = "_75" }
+            if (volume >= 0.75)                      { volumeIndicator = "_100" }
             if (volume == 0)                        { volumeIndicator = "_0" }
         }
         if ((iconTemp?.range(of: "BT") != nil) || (iconTemp?.range(of: "Bose") != nil)) {

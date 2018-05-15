@@ -125,6 +125,7 @@
 				TargetAttributes = {
 					7DADF85A1F347E8200BB0DF2 = {
 						CreatedOnToolsVersion = 8.3.3;
+						DevelopmentTeam = UJTM88G62N;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
@@ -305,6 +306,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = UJTM88G62N;
 				INFOPLIST_FILE = AudioDevice2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
@@ -320,6 +322,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = UJTM88G62N;
 				INFOPLIST_FILE = AudioDevice2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
