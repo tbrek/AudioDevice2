@@ -30,12 +30,23 @@ var timer: Timer!
 var useShortNames: Bool!
 var deviceColor: NSColor!
 let defaults = UserDefaults.standard
+var type: String!
+let volumeItem = NSMenuItem()
+
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
     private var statusItem: NSStatusItem!
     
     override init() {
+        type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
+        let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 170, height: 19))
+                volumeSliderView.addSubview(volumeSlider)
+                volumeSlider.minValue = 0.0
+                volumeSlider.maxValue = 1
+                volumeSlider.floatValue = 0.5
+                volumeItem.view = volumeSliderView
+                volumeSlider.isContinuous = true
         super.init()
         showOutputDevice = defaults.object(forKey: "showOutputDevice") as! Bool?
         showInputDevice  = defaults.object(forKey: "showInputDevice") as! Bool?
@@ -162,6 +173,7 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func updateIcon() {
+        type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
         getDeviceVolume()
         var iconTemp = currentOutputDevice
         volume = volumeSlider.floatValue
@@ -184,17 +196,17 @@ class AudioDeviceController: NSObject {
         }
         switch iconTemp {
         case "BT"?:
-            icon = NSImage(named: NSImage.Name(rawValue: "Bluetooth" + volumeIndicator))
+            icon = NSImage(named: NSImage.Name(rawValue: type + "_Bluetooth" + volumeIndicator))
         case "Internal Speakers"?:
-            icon = NSImage(named: NSImage.Name(rawValue: "Speakers" + volumeIndicator))
+            icon = NSImage(named: NSImage.Name(rawValue: type + "_Speakers" + volumeIndicator))
         case "Display Audio"?:
-            icon = NSImage(named: NSImage.Name(rawValue: "Display Audio" + volumeIndicator))
+            icon = NSImage(named: NSImage.Name(rawValue: type + "_Display Audio" + volumeIndicator))
         case "Headphones"?:
-            icon = NSImage(named: NSImage.Name(rawValue: "Headphones" + volumeIndicator))
+            icon = NSImage(named: NSImage.Name(rawValue: type + "_Headphones" + volumeIndicator))
         default:
-            icon = NSImage(named: NSImage.Name(rawValue: "Default" + volumeIndicator))
+            icon = NSImage(named: NSImage.Name(rawValue: type + "_Default" + volumeIndicator))
         }
-        icon?.isTemplate = true
+//        icon?.isTemplate = true
         statusItem.image = icon
     }
     
@@ -205,16 +217,8 @@ class AudioDeviceController: NSObject {
         getOutputs()
         self.menu.removeAllItems()
         self.menu.addItem(NSMenuItem(title: "Volume:", target:self))
-        let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 170, height: 19))
-        let volumeItem = NSMenuItem()
-        volumeSliderView.addSubview(volumeSlider)
-        volumeSlider.minValue = 0.0
-        volumeSlider.maxValue = 1
-        volumeSlider.floatValue = 0.5
         volumeSlider.target = self
-        volumeSlider.action = #selector(setDeviceVolume)
-        volumeItem.view = volumeSliderView
-        volumeSlider.isContinuous = true
+        volumeSlider.action = #selector(setDeviceVolume(slider:))
         self.menu.addItem(volumeItem)
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Output Device:", comment: "")))
         outputsArray.forEach { device in
@@ -282,7 +286,6 @@ class AudioDeviceController: NSObject {
         }
         defaults.set(useShortNames, forKey: "useShortNames")
         updateMenu()
-        print(useShortNames)
     }
     
     @objc func openSoundPreferences(_ sender: Any) {
@@ -351,7 +354,6 @@ class AudioDeviceController: NSObject {
         propertyAddress.mElement = channels[1]
         AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &rightLevel)
         volumeSlider.floatValue = leftLevel
-//        print(leftLevel, rightLevel, muteVal)
     }
     
     @objc func setDeviceVolume(slider: NSSlider) {
