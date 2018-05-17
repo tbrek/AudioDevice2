@@ -1,8 +1,6 @@
 //
 //  AudioDeviceController.swift
-//  AudioSwitcher
 //
-
 
 import Cocoa
 import CoreServices
@@ -32,7 +30,6 @@ var deviceColor: NSColor!
 let defaults = UserDefaults.standard
 var type: String!
 let volumeItem = NSMenuItem()
-
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
@@ -144,9 +141,32 @@ class AudioDeviceController: NSObject {
         getCurrentInput()
         getCurrentOutput()
         if (menu.item(withTitle: "Use Short Names")?.state == .on) {
-            trimmed1 = String(trimmed1.prefix(4))
-            trimmed2 = String(trimmed2.prefix(4))
+            switch trimmed1 {
+            case "Display Audio"?:
+                trimmed1 = "Disp. Audio"
+            case "Bose OE"?:
+                trimmed1 = "Bose"
+            case "Headphones"?:
+                trimmed1 = "Head"
+            case "Internal Speakers"?:
+                trimmed1 = "Int. Speak."
+            default:
+                trimmed1 = String(trimmed1.prefix(4))
+            }
+            switch trimmed2 {
+            case "Display Audio"?:
+                trimmed2 = "Disp. Audio"
+            case "Bose OE"?:
+                trimmed2 = "Bose"
+            case "External Microphone"?:
+                trimmed2 = "Ext. Mic"
+            case "Internal Microphone"?:
+                trimmed2 = "Int. Mic"
+            default:
+                trimmed2 = String(trimmed2.prefix(4))
+            }
         }
+        
         if ((menu.item(withTitle: "Show Output")?.state == .on) && (menu.item(withTitle: "Show Input")?.state == .on)) {
             trimmed1 = trimmed1 + "\n"
             let outputDevice = NSAttributedString(string: trimmed1, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
@@ -200,7 +220,7 @@ class AudioDeviceController: NSObject {
         case "Internal Speakers"?:
             icon = NSImage(named: NSImage.Name(rawValue: type + "_Speakers" + volumeIndicator))
         case "Display Audio"?:
-            icon = NSImage(named: NSImage.Name(rawValue: type + "_Display Audio" + volumeIndicator))
+            icon = NSImage(named: NSImage.Name(rawValue: type + "_Display" + volumeIndicator))
         case "Headphones"?:
             icon = NSImage(named: NSImage.Name(rawValue: type + "_Headphones" + volumeIndicator))
         default:
