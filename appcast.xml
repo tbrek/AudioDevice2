@@ -10,7 +10,7 @@
           <!-- <sparkle:releaseNotesLink>
           </sparkle:releaseNotesLink> -->
           <pubDate>Mon, 08 Jun 2018 08:00:00 +0000</pubDate>
-          <enclosure url="https://github.com/tbrek/AudioDevice2/releases/download/v2.1/AudioDevice.2.2.dmg"
+          <enclosure url="https://github.com/tbrek/AudioDevice2/releases/download/v2.2/AudioDevice.2.2.dmg"
                      sparkle:version="2.2"
                      length="0"
                      type="application/octet-stream" />
