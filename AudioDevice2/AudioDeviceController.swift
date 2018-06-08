@@ -35,6 +35,15 @@ class AudioDeviceController: NSObject {
     var menu: NSMenu!
     private var statusItem: NSStatusItem!
     
+    private weak var preferencesWindow: NSWindow!
+    private weak var showInputCheck: NSButton!
+    private weak var showOutputCheck: NSButton!
+    private weak var useShortNamesCheck: NSButton!
+    
+    
+    
+    
+    
     override init() {
         type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
         let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 170, height: 19))
@@ -140,7 +149,7 @@ class AudioDeviceController: NSObject {
     @objc func updateMenu() {
         getCurrentInput()
         getCurrentOutput()
-        if (menu.item(withTitle: "Use Short Names")?.state == .on) {
+        if (useShortNames == true) {
             switch trimmed1 {
             case "Display Audio"?:
                 trimmed1 = "Disp. Audio"
@@ -167,7 +176,7 @@ class AudioDeviceController: NSObject {
             }
         }
         
-        if ((menu.item(withTitle: "Show Output")?.state == .on) && (menu.item(withTitle: "Show Input")?.state == .on)) {
+        if (showOutputDevice == true) && (showInputDevice == true) {
             trimmed1 = trimmed1 + "\n"
             let outputDevice = NSAttributedString(string: trimmed1, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
             let inputDevice = NSAttributedString(string: trimmed2, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
@@ -180,13 +189,13 @@ class AudioDeviceController: NSObject {
             self.statusItem.attributedTitle = combination
             
         }
-        if ((menu.item(withTitle: "Show Output")?.state == .on) && (menu.item(withTitle: "Show Input")?.state == .off)) {
+        if (showOutputDevice == true) && (showInputDevice == false) {
             self.statusItem.title = trimmed1
         }
-        if ((menu.item(withTitle: "Show Output")?.state == .off) && (menu.item(withTitle: "Show Input")?.state == .on)) {
+        if (showOutputDevice == false) && (showInputDevice == true) {
             self.statusItem.title = trimmed2
         }
-        if ((menu.item(withTitle: "Show Output")?.state == .off) && (menu.item(withTitle: "Show Input")?.state == .off)) {
+        if (showOutputDevice == false) && (showInputDevice == false) {
             self.statusItem.title = ""
         }
         updateIcon()
@@ -205,11 +214,11 @@ class AudioDeviceController: NSObject {
             
         }
         else {
-            if (volume < 0.25 && volume > 0)        { volumeIndicator = "_25" }
-            if (volume < 0.50 && volume >= 0.25)     { volumeIndicator = "_50" }
-            if (volume < 0.75 && volume >= 0.50)     { volumeIndicator = "_75" }
+            if (volume < 0.25 && volume > 0)         { volumeIndicator = "_25"  }
+            if (volume < 0.50 && volume >= 0.25)     { volumeIndicator = "_50"  }
+            if (volume < 0.75 && volume >= 0.50)     { volumeIndicator = "_75"  }
             if (volume >= 0.75)                      { volumeIndicator = "_100" }
-            if (volume == 0)                        { volumeIndicator = "_0" }
+            if (volume == 0)                         { volumeIndicator = "_0"   }
         }
         if ((iconTemp?.range(of: "BT") != nil) || (iconTemp?.range(of: "Bose") != nil)) {
             iconTemp = "BT"
@@ -259,13 +268,8 @@ class AudioDeviceController: NSObject {
         }
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: "Sound Preferences...", target: self, action: #selector(openSoundPreferences(_:))))
+        self.menu.addItem(NSMenuItem(title: "Preferences...", target: self, action: #selector(openPreferences(_:))))
         self.menu.addItem(NSMenuItem.separator())
-        self.menu.addItem(NSMenuItem(title: "Show Output", target: self, action: #selector(showOutput(_: ))))
-        menu.item(withTitle: "Show Output")?.state = showOutputDevice == true ? .on : .off
-        self.menu.addItem(NSMenuItem(title: "Show Input", target: self, action: #selector(showInput(_: ))))
-        menu.item(withTitle: "Show Input")?.state = showInputDevice == true ? .on : .off
-        self.menu.addItem(NSMenuItem(title: "Use Short Names", target: self, action: #selector(useShortNamesClicked(_: ))))
-        menu.item(withTitle: "Use Short Names")?.state = useShortNames == true ? .on : .off
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
         updateMenu()
@@ -295,16 +299,21 @@ class AudioDeviceController: NSObject {
         updateMenu()
     }
 
-    @objc func useShortNamesClicked(_ sender: NSMenuItem) {
-        if (self.menu.item(withTitle: "Use Short Names")?.state == .on) {
-            self.menu.item(withTitle: "Use Short Names")?.state = .off
-            useShortNames = false
-        }
-        else {
-            self.menu.item(withTitle: "Use Short Names")?.state = .on
-            useShortNames = true
-        }
+    @IBAction func useShortNamesClicked(_ sender: Any) {
+        useShortNames = useShortNamesCheck.state == .on ? true : false
         defaults.set(useShortNames, forKey: "useShortNames")
+        updateMenu()
+    }
+    
+    @IBAction func showInputClicked(_ sender: Any) {
+        showInputDevice = showInputCheck.state == .on ? true : false
+        defaults.set(showInputDevice, forKey: "showInputDevice")
+        updateMenu()
+    }
+    
+    @IBAction func showOutputClicked(_ sender: Any) {
+        showOutputDevice = showOutputCheck.state == .on ? true : false
+        defaults.set(showOutputDevice, forKey: "showOutputDevice")
         updateMenu()
     }
     
@@ -312,34 +321,15 @@ class AudioDeviceController: NSObject {
         NSWorkspace.shared.openFile("/System/Library/PreferencePanes/Sound.prefPane")
     }
     
+    @objc func openPreferences(_ sender: Any) {
+        showOutputCheck?.state = showOutputDevice == true ? .on : .off
+        showInputCheck?.state = showInputDevice == true ? .on : .off
+        useShortNamesCheck?.state = useShortNames == true ? .on : .off
+        self.preferencesWindow.orderFrontRegardless()
+    }
+    
     @objc private func quitAction(_ sender: NSMenuItem) {
         NSApplication.shared.terminate(nil)
-    }
-    
-    @objc private func showOutput(_ sender: NSMenuItem) {
-        if (self.menu.item(withTitle: "Show Output")?.state == .on) {
-            self.menu.item(withTitle: "Show Output")?.state = .off
-            showOutputDevice = false
-            }
-            else {
-            self.menu.item(withTitle: "Show Output")?.state = .on
-            showOutputDevice = true
-            }
-        defaults.set(showOutputDevice, forKey: "showOutputDevice")
-        updateMenu()
-    }
-    
-    @objc private func showInput(_ sender: NSMenuItem) {
-        if (self.menu.item(withTitle: "Show Input")?.state == .on) {
-            self.menu.item(withTitle: "Show Input")?.state = .off
-            showInputDevice = false
-            }
-            else {
-                self.menu.item(withTitle: "Show Input")?.state = .on
-                showInputDevice = true
-            }
-        defaults.set(showInputDevice, forKey: "showInputDevice")
-        updateMenu()
     }
     
     func getDeviceVolume() {
