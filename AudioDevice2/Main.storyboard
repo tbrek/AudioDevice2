@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -188,8 +189,72 @@
                     </connections>
                 </application>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="AudioDevice2" customModuleProvider="target"/>
-                <customObject id="yVI-aX-W2l" customClass="AudioDeviceController" customModule="AudioDevice2" customModuleProvider="target"/>
+                <customObject id="yVI-aX-W2l" customClass="AudioDeviceController" customModule="AudioDevice2" customModuleProvider="target">
+                    <connections>
+                        <outlet property="preferencesWindow" destination="FaA-Je-di8" id="8S8-n1-zGI"/>
+                        <outlet property="showInputCheck" destination="3YA-AE-Y6x" id="Xjv-Cs-iAf"/>
+                        <outlet property="showOutputCheck" destination="q7d-Cp-wZ1" id="Vw7-OI-1dk"/>
+                        <outlet property="useShortNamesCheck" destination="ZlE-JP-X0A" id="sbH-ER-2wh"/>
+                    </connections>
+                </customObject>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="FaA-Je-di8">
+                    <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
+                    <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                    <rect key="contentRect" x="1128" y="633" width="362" height="148"/>
+                    <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
+                    <view key="contentView" wantsLayer="YES" id="UV8-tf-aOc">
+                        <rect key="frame" x="0.0" y="0.0" width="362" height="148"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3YA-AE-Y6x">
+                                <rect key="frame" x="18" y="112" width="90" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Show input" bezelStyle="regularSquare" imagePosition="left" inset="2" id="JoA-tt-xAl">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="showInputClicked:" target="yVI-aX-W2l" id="U0c-J7-37U"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q7d-Cp-wZ1">
+                                <rect key="frame" x="18" y="92" width="99" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Show output" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="JsG-vr-NvJ">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="showOutputClicked:" target="yVI-aX-W2l" id="xby-vc-CLQ"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZlE-JP-X0A">
+                                <rect key="frame" x="18" y="72" width="125" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Use short names" bezelStyle="regularSquare" imagePosition="left" inset="2" id="vKb-op-Wi3">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <connections>
+                                        <action selector="useShortNamesClicked:" target="yVI-aX-W2l" id="Lzm-lb-5ew"/>
+                                    </connections>
+                                </buttonCell>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KJp-ET-AkY">
+                                <rect key="frame" x="14" y="13" width="152" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Check for updates" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QPI-Pa-t6J">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="checkForUpdates:" target="MvV-TI-Zea" id="1LE-Pz-FuU"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                    </view>
+                </window>
+                <customObject id="MvV-TI-Zea" customClass="SUUpdater"/>
             </objects>
             <point key="canvasLocation" x="208" y="-78"/>
         </scene>

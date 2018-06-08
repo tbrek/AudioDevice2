@@ -10,13 +10,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "AudioDevice2/AppDelegate.swift"
-            timestampString = "548162546.177668"
+            timestampString = "550073084.6777869"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "10"
             endingLineNumber = "10"
-            landmarkName = "AppDelegate"
-            landmarkType = "3">
+            landmarkName = "unknown"
+            landmarkType = "0">
             <Locations>
                <Location
                   shouldBeEnabled = "No"
@@ -77,6 +77,54 @@
                   startingLineNumber = "10"
                   endingLineNumber = "10"
                   offsetFromSymbolStart = "4">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "AudioDevice2/AudioDeviceController.swift"
+            timestampString = "550139726.745575"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
+            landmarkName = "AudioDeviceController"
+            landmarkType = "3">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "AudioDevice2.AudioDeviceController.preferencesWindow.getter : Swift.ImplicitlyUnwrappedOptional&lt;__ObjC.NSWindow&gt;"
+                  moduleName = "AudioDevice2"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/tbrek/Documents/projects/Xcode/macOS/AudioDevice2/AudioDevice2/AudioDeviceController.swift"
+                  timestampString = "550075079.0413409"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "36"
+                  endingLineNumber = "36"
+                  offsetFromSymbolStart = "109">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "AudioDevice2.AudioDeviceController.preferencesWindow.setter : Swift.ImplicitlyUnwrappedOptional&lt;__ObjC.NSWindow&gt;"
+                  moduleName = "AudioDevice2"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/tbrek/Documents/projects/Xcode/macOS/AudioDevice2/AudioDevice2/AudioDeviceController.swift"
+                  timestampString = "550075079.044466"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "36"
+                  endingLineNumber = "36"
+                  offsetFromSymbolStart = "112">
                </Location>
             </Locations>
          </BreakpointContent>

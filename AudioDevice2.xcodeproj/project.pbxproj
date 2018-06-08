@@ -16,7 +16,23 @@
 		7DB6A5CA1F37081700149D6D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7DB6A5C91F37081700149D6D /* Main.storyboard */; };
 		7DB6A5D11F37090100149D6D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7DB6A5D31F37090100149D6D /* Localizable.strings */; };
 		D51ABA3F20921DE7002F53C9 /* audiodevice in Resources */ = {isa = PBXBuildFile; fileRef = D51ABA3E20921DE6002F53C9 /* audiodevice */; };
+		D5CE6D2020CA6E0200C2BD5F /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = D5CE6D1C20CA696400C2BD5F /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D5CE6D2220CA6E3200C2BD5F /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5CE6D1C20CA696400C2BD5F /* Sparkle.framework */; };
+		D5CE6D2420CA74C900C2BD5F /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = D5CE6D2320CA74C800C2BD5F /* dsa_pub.pem */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D5CE6D1F20CA6DF700C2BD5F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D5CE6D2020CA6E0200C2BD5F /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		7DADF85B1F347E8200BB0DF2 /* AudioDevice2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioDevice2.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -30,6 +46,8 @@
 		7DB6A5C91F37081700149D6D /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		7DB6A5D21F37090100149D6D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D51ABA3E20921DE6002F53C9 /* audiodevice */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = audiodevice; sourceTree = "<group>"; };
+		D5CE6D1C20CA696400C2BD5F /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		D5CE6D2320CA74C800C2BD5F /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,6 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5CE6D2220CA6E3200C2BD5F /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,8 +65,10 @@
 		7DADF8521F347E8200BB0DF2 = {
 			isa = PBXGroup;
 			children = (
+				D5CE6D2320CA74C800C2BD5F /* dsa_pub.pem */,
 				7DADF85D1F347E8200BB0DF2 /* AudioDevice2 */,
 				7DADF85C1F347E8200BB0DF2 /* Products */,
+				D5CE6D2120CA6E3200C2BD5F /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -62,6 +83,7 @@
 		7DADF85D1F347E8200BB0DF2 /* AudioDevice2 */ = {
 			isa = PBXGroup;
 			children = (
+				D5CE6D1C20CA696400C2BD5F /* Sparkle.framework */,
 				7DADF86E1F347EC500BB0DF2 /* Extension */,
 				7DADF85E1F347E8200BB0DF2 /* AppDelegate.swift */,
 				7DADF8731F347F0200BB0DF2 /* AudioDeviceListener.swift */,
@@ -92,6 +114,13 @@
 			name = Extension;
 			sourceTree = "<group>";
 		};
+		D5CE6D2120CA6E3200C2BD5F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -102,6 +131,7 @@
 				7DADF8571F347E8200BB0DF2 /* Sources */,
 				7DADF8581F347E8200BB0DF2 /* Frameworks */,
 				7DADF8591F347E8200BB0DF2 /* Resources */,
+				D5CE6D1F20CA6DF700C2BD5F /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -120,7 +150,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
 				LastUpgradeCheck = 0930;
-				ORGANIZATIONNAME = Sunnyyoung;
+				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					7DADF85A1F347E8200BB0DF2 = {
 						CreatedOnToolsVersion = 8.3.3;
@@ -153,6 +183,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5CE6D2420CA74C900C2BD5F /* dsa_pub.pem in Resources */,
 				7DB6A5CA1F37081700149D6D /* Main.storyboard in Resources */,
 				D51ABA3F20921DE7002F53C9 /* audiodevice in Resources */,
 				7DB6A5D11F37090100149D6D /* Localizable.strings in Resources */,
@@ -305,8 +336,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = UJTM88G62N;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/AudioDevice2",
+				);
 				INFOPLIST_FILE = AudioDevice2/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tombrek.audiodevice2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -321,8 +356,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = UJTM88G62N;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/AudioDevice2",
+				);
 				INFOPLIST_FILE = AudioDevice2/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tombrek.audiodevice2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
