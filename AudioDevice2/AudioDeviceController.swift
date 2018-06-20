@@ -180,12 +180,9 @@ class AudioDeviceController: NSObject {
             trimmed1 = trimmed1 + "\n"
             let outputDevice = NSAttributedString(string: trimmed1, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
             let inputDevice = NSAttributedString(string: trimmed2, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
-            
             let combination = NSMutableAttributedString()
             combination.append(outputDevice)
             combination.append(inputDevice)
-//            combination.addAttribute(NSAttributedStringKey.strikethroughStyle, value: 1, range: NSMakeRange(0, combination.length))
-//            combination.addAttribute(NSAttributedStringKey.backgroundColor, value: NSColor.red, range: NSMakeRange(0, combination.length))
             self.statusItem.attributedTitle = combination
             
         }
@@ -207,11 +204,7 @@ class AudioDeviceController: NSObject {
         var iconTemp = currentOutputDevice
         volume = volumeSlider.floatValue
         if isMuted == true                      {
-            
-            
             volumeIndicator = "_muted"
-            
-            
         }
         else {
             if (volume < 0.25 && volume > 0)         { volumeIndicator = "_25"  }
@@ -235,7 +228,6 @@ class AudioDeviceController: NSObject {
         default:
             icon = NSImage(named: NSImage.Name(rawValue: type + "_Default" + volumeIndicator))
         }
-//        icon?.isTemplate = true
         statusItem.image = icon
     }
     

@@ -72,27 +72,7 @@ struct AudioListener {
 
 class AudioDeviceListener {
     static let shared = AudioDeviceListener()
-
-//    var selectedOutputDeviceID: AudioDeviceID? {
-//        didSet {
-//            guard var deviceID = self.selectedOutputDeviceID else {
-//                return
-//            }
-//            self.setOutputDevice(id: &deviceID)
-//        }
-//    }
-//    var selectedInputDeviceID: AudioDeviceID? {
-//        didSet {
-//            guard var deviceID = self.selectedInputDeviceID else {
-//                return
-//            }
-//            self.setInputDevice(id: &deviceID)
-//        }
-//    }
     
-    
-    
-
     // MARK: Lifecycle
     init() {
         NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioDevicesDidChange)
@@ -122,11 +102,10 @@ class AudioDeviceListener {
     // MARK: Notification handler
     @objc private func handleNotification(_ notification: Notification) {
         if notification.name == AudioDeviceNotification.audioDevicesDidChange.notificationName {
-//            print("Something has changed")
         } else if notification.name == AudioDeviceNotification.audioOutputDeviceDidChange.notificationName {
-//           print("Output has changed")
+
         } else if notification.name == AudioDeviceNotification.audioInputDeviceDidChange.notificationName {
-//           print("Input has changed")
+
         }
     }
 }
