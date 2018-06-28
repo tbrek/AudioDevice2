@@ -24,7 +24,8 @@ var isMuted: Bool!
 var muteVal = Float32(-1)
 var showInputDevice: Bool!
 var showOutputDevice: Bool!
-var timer: Timer!
+var timer1: Timer!
+var timer2: Timer!
 var useShortNames: Bool!
 var deviceColor: NSColor!
 let defaults = UserDefaults.standard
@@ -39,10 +40,6 @@ class AudioDeviceController: NSObject {
     private weak var showInputCheck: NSButton!
     private weak var showOutputCheck: NSButton!
     private weak var useShortNamesCheck: NSButton!
-    
-    
-    
-    
     
     override init() {
         type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
@@ -61,14 +58,16 @@ class AudioDeviceController: NSObject {
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioOutputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
+        timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
+        timer2 = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(checkifHeadphonesSpekers), userInfo: nil, repeats: true)
     }
 
     deinit {
         NotificationCenter.removeObserver(observer: self, name: .audioDevicesDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioOutputDeviceDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
-        timer.invalidate()
+        timer1.invalidate()
+        timer2.invalidate()
     }
 
     private func setupItems() {
@@ -198,7 +197,15 @@ class AudioDeviceController: NSObject {
         updateIcon()
     }
     
+    @objc func checkifHeadphonesSpekers() {
+        if (currentOutputDevice == "Internal Speakers" || currentOutputDevice == "Headphones") {
+            reloadMenu()
+        }
+    }
+    
+    
     @objc func updateIcon() {
+        
         type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
         getDeviceVolume()
         var iconTemp = currentOutputDevice

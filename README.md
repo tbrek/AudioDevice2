@@ -32,6 +32,10 @@ Preferences menu:
 
 ## Changelog
 
+##### Version 2.3.1:
+
+* Fixing headphones/speakers switch
+
 ##### Version 2.3:
 
 * It's fully 64-bit now (no complains from 10.12+)

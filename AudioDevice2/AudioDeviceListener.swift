@@ -103,9 +103,7 @@ class AudioDeviceListener {
     @objc private func handleNotification(_ notification: Notification) {
         if notification.name == AudioDeviceNotification.audioDevicesDidChange.notificationName {
         } else if notification.name == AudioDeviceNotification.audioOutputDeviceDidChange.notificationName {
-
         } else if notification.name == AudioDeviceNotification.audioInputDeviceDidChange.notificationName {
-
         }
     }
 }
