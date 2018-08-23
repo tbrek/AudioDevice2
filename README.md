@@ -32,6 +32,10 @@ Preferences menu:
 
 ## Changelog
 
+#### Version 2.3.3:
+
+* Bump for Mojave
+
 ##### Version 2.3.1:
 
 * Fixing headphones/speakers switch
