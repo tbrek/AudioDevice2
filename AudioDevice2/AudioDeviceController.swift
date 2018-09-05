@@ -60,6 +60,9 @@ class AudioDeviceController: NSObject {
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
         timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
         timer2 = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(checkifHeadphonesSpekers), userInfo: nil, repeats: true)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(sleepListener), name: NSWorkspace.willPowerOffNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(wakeUpListener), name: NSWorkspace.screensDidSleepNotification, object: nil)
+        
     }
 
     deinit {
@@ -68,6 +71,15 @@ class AudioDeviceController: NSObject {
         NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
         timer1.invalidate()
         timer2.invalidate()
+    }
+    
+   
+    @objc func sleepListener() {
+        print("Sleep Listening");
+    }
+    
+    @objc func wakeUpListener() {
+        print("Wake Up Listening");
     }
 
     private func setupItems() {

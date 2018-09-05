@@ -154,9 +154,7 @@
 				TargetAttributes = {
 					7DADF85A1F347E8200BB0DF2 = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = UJTM88G62N;
 						LastSwiftMigration = 0900;
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -339,7 +337,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = UJTM88G62N;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/AudioDevice2",
@@ -362,7 +360,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = UJTM88G62N;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/AudioDevice2",
