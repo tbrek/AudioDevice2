@@ -6,6 +6,7 @@ import Cocoa
 import CoreServices
 import CoreAudio
 import CoreImage
+import Quartz
 
 var trimmed1: String!
 var trimmed2: String!
@@ -26,6 +27,7 @@ var showInputDevice: Bool!
 var showOutputDevice: Bool!
 var timer1: Timer!
 var timer2: Timer!
+var timer3: Timer!
 var useShortNames: Bool!
 var deviceColor: NSColor!
 let defaults = UserDefaults.standard
@@ -60,8 +62,9 @@ class AudioDeviceController: NSObject {
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
         timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
         timer2 = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(checkifHeadphonesSpekers), userInfo: nil, repeats: true)
-        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(sleepListener), name: NSWorkspace.willPowerOffNotification, object: nil)
-        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(wakeUpListener), name: NSWorkspace.screensDidSleepNotification, object: nil)
+        let center = DistributedNotificationCenter.default()
+        center.addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name(rawValue: "com.apple.screenIsLocked"), object: nil)
+        center.addObserver(self, selector: #selector(screenUnlocked), name: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"), object: nil)
         
     }
 
@@ -73,13 +76,24 @@ class AudioDeviceController: NSObject {
         timer2.invalidate()
     }
     
-   
-    @objc func sleepListener() {
-        print("Sleep Listening");
+    @objc func listProcesess() {
+        let ws = NSWorkspace.shared
+        let apps = ws.runningApplications
+        for currentApp in apps
+        {
+            if(currentApp.activationPolicy == .accessory){
+                print(currentApp.localizedName!)
+            }
+        }
+        print("--------")
     }
     
-    @objc func wakeUpListener() {
-        print("Wake Up Listening");
+    @objc func screenLocked() {
+        print("Screen Locked");
+    }
+    
+    @objc func screenUnlocked() {
+        print("Screen Unlocked");
     }
 
     private func setupItems() {
