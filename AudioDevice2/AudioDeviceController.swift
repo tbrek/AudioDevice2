@@ -32,12 +32,13 @@ var useShortNames: Bool!
 var deviceColor: NSColor!
 let defaults = UserDefaults.standard
 var type: String!
+var spotifyStatus: NSAppleEventDescriptor!
+var iTunesStatus: NSAppleEventDescriptor!
 let volumeItem = NSMenuItem()
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
     private var statusItem: NSStatusItem!
-    
     private weak var preferencesWindow: NSWindow!
     private weak var showInputCheck: NSButton!
     private weak var showOutputCheck: NSButton!
@@ -89,11 +90,43 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func screenLocked() {
-        print("Screen Locked");
+        var command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
+        var commandObject = NSAppleScript(source: command)
+        var error: NSDictionary?
+        spotifyStatus = commandObject!.executeAndReturnError(&error)
+        
+        command = "if application \"Spotify\" is running then tell application \"Spotify\" to pause"
+        commandObject = NSAppleScript(source: command)
+        commandObject!.executeAndReturnError(&error)
+
+        command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
+        commandObject = NSAppleScript(source: command)
+        iTunesStatus = commandObject!.executeAndReturnError(&error)
+        
+        command = "if application \"iTunes\" is running then tell application \"iTunes\" to pause"
+        commandObject = NSAppleScript(source: command)
+        commandObject!.executeAndReturnError(&error)
+        
+        
     }
     
     @objc func screenUnlocked() {
-        print("Screen Unlocked");
+        if (spotifyStatus.stringValue == "playing") {
+            let command = "if application \"Spotify\" is running then tell application \"Spotify\" to play"
+            let commandObject = NSAppleScript(source: command)
+            var error: NSDictionary?
+            commandObject!.executeAndReturnError(&error)
+        }
+        
+        if (iTunesStatus.stringValue == "playing") {
+            let command = "if application \"iTunes\" is running then tell application \"iTunes\" to play"
+            let commandObject = NSAppleScript(source: command)
+            var error: NSDictionary?
+            commandObject!.executeAndReturnError(&error)
+        }
+        
+        
+        
     }
 
     private func setupItems() {
