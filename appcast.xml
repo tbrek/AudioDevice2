@@ -6,6 +6,29 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
       <item>
+          <title>Version 2.3.5</title>
+          <description><![CDATA[
+            <b>2.3.5</b>
+            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li>
+            <b>2.3.3</b>
+            <li>Mojave update</li>
+            <b>2.3.1</b>
+            <li>Fixing headphones/speakers switch</li>
+            <b>2.3</b>
+            <li>Making app fully 64-bit</li>
+            <b>2.2</b>
+            <li>Added autoupdater</li>
+            ]]>
+          </description>
+          <!-- <sparkle:releaseNotesLink>
+          </sparkle:releaseNotesLink> -->
+          <pubDate>Wed, 20 Jun 2018 08:00:00 +0000</pubDate>
+          <enclosure url="https://github.com/tbrek/AudioDevice2/releases/download/v2.3.5/AudioDevice.2.3.5.dmg"
+                     sparkle:version="2.3.5"
+                     length="0"
+                     type="application/octet-stream" />
+      </item>
+      <item>
           <title>Version 2.3.3</title>
           <description><![CDATA[
             <b>2.3.3</b>

@@ -81,53 +81,5 @@
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "AudioDevice2/AudioDeviceController.swift"
-            timestampString = "551882272.9504319"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "37"
-            endingLineNumber = "37"
-            landmarkName = "AudioDeviceController"
-            landmarkType = "3">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "AudioDevice2.AudioDeviceController.preferencesWindow.getter : Swift.ImplicitlyUnwrappedOptional&lt;__ObjC.NSWindow&gt;"
-                  moduleName = "AudioDevice2"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/tbrek/Documents/projects/Xcode/macOS/AudioDevice2/AudioDevice2/AudioDeviceController.swift"
-                  timestampString = "550075079.0413409"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "36"
-                  endingLineNumber = "36"
-                  offsetFromSymbolStart = "109">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "AudioDevice2.AudioDeviceController.preferencesWindow.setter : Swift.ImplicitlyUnwrappedOptional&lt;__ObjC.NSWindow&gt;"
-                  moduleName = "AudioDevice2"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/tbrek/Documents/projects/Xcode/macOS/AudioDevice2/AudioDevice2/AudioDeviceController.swift"
-                  timestampString = "550075079.044466"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "36"
-                  endingLineNumber = "36"
-                  offsetFromSymbolStart = "112">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
    </Breakpoints>
 </Bucket>

@@ -6,6 +6,7 @@ import Cocoa
 import CoreServices
 import CoreAudio
 import CoreImage
+import Quartz
 
 var trimmed1: String!
 var trimmed2: String!
@@ -26,16 +27,18 @@ var showInputDevice: Bool!
 var showOutputDevice: Bool!
 var timer1: Timer!
 var timer2: Timer!
+var timer3: Timer!
 var useShortNames: Bool!
 var deviceColor: NSColor!
 let defaults = UserDefaults.standard
 var type: String!
+var spotifyStatus: NSAppleEventDescriptor!
+var iTunesStatus: NSAppleEventDescriptor!
 let volumeItem = NSMenuItem()
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
     private var statusItem: NSStatusItem!
-    
     private weak var preferencesWindow: NSWindow!
     private weak var showInputCheck: NSButton!
     private weak var showOutputCheck: NSButton!
@@ -60,6 +63,10 @@ class AudioDeviceController: NSObject {
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
         timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
         timer2 = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(checkifHeadphonesSpekers), userInfo: nil, repeats: true)
+        let center = DistributedNotificationCenter.default()
+        center.addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name(rawValue: "com.apple.screenIsLocked"), object: nil)
+        center.addObserver(self, selector: #selector(screenUnlocked), name: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"), object: nil)
+        
     }
 
     deinit {
@@ -68,6 +75,58 @@ class AudioDeviceController: NSObject {
         NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
         timer1.invalidate()
         timer2.invalidate()
+    }
+    
+    @objc func listProcesess() {
+        let ws = NSWorkspace.shared
+        let apps = ws.runningApplications
+        for currentApp in apps
+        {
+            if(currentApp.activationPolicy == .accessory){
+                print(currentApp.localizedName!)
+            }
+        }
+        print("--------")
+    }
+    
+    @objc func screenLocked() {
+        var command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
+        var commandObject = NSAppleScript(source: command)
+        var error: NSDictionary?
+        spotifyStatus = commandObject!.executeAndReturnError(&error)
+        
+        command = "if application \"Spotify\" is running then tell application \"Spotify\" to pause"
+        commandObject = NSAppleScript(source: command)
+        commandObject!.executeAndReturnError(&error)
+
+        command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
+        commandObject = NSAppleScript(source: command)
+        iTunesStatus = commandObject!.executeAndReturnError(&error)
+        
+        command = "if application \"iTunes\" is running then tell application \"iTunes\" to pause"
+        commandObject = NSAppleScript(source: command)
+        commandObject!.executeAndReturnError(&error)
+        
+        
+    }
+    
+    @objc func screenUnlocked() {
+        if (spotifyStatus.stringValue == "playing") {
+            let command = "if application \"Spotify\" is running then tell application \"Spotify\" to play"
+            let commandObject = NSAppleScript(source: command)
+            var error: NSDictionary?
+            commandObject!.executeAndReturnError(&error)
+        }
+        
+        if (iTunesStatus.stringValue == "playing") {
+            let command = "if application \"iTunes\" is running then tell application \"iTunes\" to play"
+            let commandObject = NSAppleScript(source: command)
+            var error: NSDictionary?
+            commandObject!.executeAndReturnError(&error)
+        }
+        
+        
+        
     }
 
     private func setupItems() {

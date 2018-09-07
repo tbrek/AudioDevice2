@@ -32,6 +32,10 @@ Preferences menu:
 
 ## Changelog
 
+##### Version 2.3.5:
+
+* Autopause for Spotify and iTunes when screen is locked
+
 ##### Version 2.3.3:
 
 * Bump for Mojave
