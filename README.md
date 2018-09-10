@@ -12,6 +12,7 @@ After re-writing the app from the scratch it become replacement for macOS' volum
 4. Show volume bar including mute state
 5. Show/hide input device
 6. Show/hide output device
+7. Autopause Spotify/iTunes when screen is locked/unlocked
 
 When display names are too long and take too much space you can `use short names` option from app's preferences.
 
@@ -31,6 +32,11 @@ Preferences menu:
 ![appdemo]
 
 ## Changelog
+
+##### Varsion 2.3.6:
+
+* Autopause control added to Preferences
+* App no longer crashes when run outside of /Applications folder
 
 ##### Version 2.3.5:
 

@@ -15,7 +15,6 @@ var currentInputDevice: String!
 var inputsArray: [String]!
 var outputsArray: [String]!
 let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 150, height: 19))
-let audiodevicePath = "/Applications/Audiodevice2.app/Contents/Resources/audiodevice"
 var leftLevel = Float32(-1)
 var rightLevel = Float32(-1)
 var icon: NSImage!
@@ -25,6 +24,7 @@ var isMuted: Bool!
 var muteVal = Float32(-1)
 var showInputDevice: Bool!
 var showOutputDevice: Bool!
+var autoPause: Bool!
 var timer1: Timer!
 var timer2: Timer!
 var timer3: Timer!
@@ -35,6 +35,8 @@ var type: String!
 var spotifyStatus: NSAppleEventDescriptor!
 var iTunesStatus: NSAppleEventDescriptor!
 let volumeItem = NSMenuItem()
+var audiodevicePath = "/Applications/Audiodevice2.app/Contents/Resources/audiodevice"
+var urlPath: URL!
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
@@ -43,6 +45,8 @@ class AudioDeviceController: NSObject {
     private weak var showInputCheck: NSButton!
     private weak var showOutputCheck: NSButton!
     private weak var useShortNamesCheck: NSButton!
+    private weak var autoPauseCheck: NSButton!
+    private weak var buttonPayPal: NSButton!
     
     override init() {
         type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
@@ -54,6 +58,11 @@ class AudioDeviceController: NSObject {
                 volumeItem.view = volumeSliderView
                 volumeSlider.isContinuous = true
         super.init()
+        
+        urlPath = Bundle.main.url(forResource: "audiodevice", withExtension: "")
+        audiodevicePath = urlPath.path
+        
+        autoPause = defaults.object(forKey: "autoPause") as! Bool?
         showOutputDevice = defaults.object(forKey: "showOutputDevice") as! Bool?
         showInputDevice  = defaults.object(forKey: "showInputDevice") as! Bool?
         useShortNames = defaults.object(forKey: "useShortNames") as! Bool?
@@ -67,12 +76,20 @@ class AudioDeviceController: NSObject {
         center.addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name(rawValue: "com.apple.screenIsLocked"), object: nil)
         center.addObserver(self, selector: #selector(screenUnlocked), name: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"), object: nil)
         
+
+        
+        
     }
 
     deinit {
         NotificationCenter.removeObserver(observer: self, name: .audioDevicesDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioOutputDeviceDidChange)
         NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
+        let center = DistributedNotificationCenter.default()
+        center.removeObserver(self, forKeyPath: NSNotification.Name(rawValue: "com.apple.screenIsLocked").rawValue)
+        center.removeObserver(self, forKeyPath: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked").rawValue)
+
+        
         timer1.invalidate()
         timer2.invalidate()
     }
@@ -90,23 +107,24 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func screenLocked() {
-        var command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
-        var commandObject = NSAppleScript(source: command)
-        var error: NSDictionary?
-        spotifyStatus = commandObject!.executeAndReturnError(&error)
+        if (autoPause == true) {
+            var command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
+            var commandObject = NSAppleScript(source: command)
+            var error: NSDictionary?
+            spotifyStatus = commandObject!.executeAndReturnError(&error)
         
-        command = "if application \"Spotify\" is running then tell application \"Spotify\" to pause"
-        commandObject = NSAppleScript(source: command)
-        commandObject!.executeAndReturnError(&error)
+            command = "if application \"Spotify\" is running then tell application \"Spotify\" to pause"
+            commandObject = NSAppleScript(source: command)
+            commandObject!.executeAndReturnError(&error)
 
-        command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
-        commandObject = NSAppleScript(source: command)
-        iTunesStatus = commandObject!.executeAndReturnError(&error)
+            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
+            commandObject = NSAppleScript(source: command)
+            iTunesStatus = commandObject!.executeAndReturnError(&error)
         
-        command = "if application \"iTunes\" is running then tell application \"iTunes\" to pause"
-        commandObject = NSAppleScript(source: command)
-        commandObject!.executeAndReturnError(&error)
-        
+            command = "if application \"iTunes\" is running then tell application \"iTunes\" to pause"
+            commandObject = NSAppleScript(source: command)
+            commandObject!.executeAndReturnError(&error)
+        }
         
     }
     
@@ -375,6 +393,13 @@ class AudioDeviceController: NSObject {
         updateMenu()
     }
     
+    @IBAction func autoPauseClicked(_ sender: Any) {
+        autoPause = autoPauseCheck.state == .on ? true : false
+        defaults.set(autoPause, forKey: "autoPause")
+    }
+    
+    
+    
     @objc func openSoundPreferences(_ sender: Any) {
         NSWorkspace.shared.openFile("/System/Library/PreferencePanes/Sound.prefPane")
     }
@@ -383,11 +408,16 @@ class AudioDeviceController: NSObject {
         showOutputCheck?.state = showOutputDevice == true ? .on : .off
         showInputCheck?.state = showInputDevice == true ? .on : .off
         useShortNamesCheck?.state = useShortNames == true ? .on : .off
+        autoPauseCheck?.state = autoPause == true ? .on : .off
         self.preferencesWindow.orderFrontRegardless()
     }
     
     @objc private func quitAction(_ sender: NSMenuItem) {
         NSApplication.shared.terminate(nil)
+    }
+    
+    @IBAction func donatePayPal(_ sender: Any) {
+        NSWorkspace.shared.open(URL(string: "https://www.paypal.me/tbrek/")!)
     }
     
     func getDeviceVolume() {
