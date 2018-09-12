@@ -193,6 +193,7 @@
                     <connections>
                         <outlet property="autoPauseCheck" destination="SXl-Ap-btO" id="swn-Y3-31q"/>
                         <outlet property="buttonPayPal" destination="tiy-Ab-W7o" id="h1Q-YV-LJK"/>
+                        <outlet property="labelVersion" destination="rYO-Fp-acy" id="lUZ-o4-rHb"/>
                         <outlet property="preferencesWindow" destination="FaA-Je-di8" id="8S8-n1-zGI"/>
                         <outlet property="showInputCheck" destination="3YA-AE-Y6x" id="Xjv-Cs-iAf"/>
                         <outlet property="showOutputCheck" destination="q7d-Cp-wZ1" id="Vw7-OI-1dk"/>
@@ -210,7 +211,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3YA-AE-Y6x">
-                                <rect key="frame" x="18" y="176" width="90" height="18"/>
+                                <rect key="frame" x="18" y="132" width="90" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Show input" bezelStyle="regularSquare" imagePosition="left" inset="2" id="JoA-tt-xAl">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -221,7 +222,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q7d-Cp-wZ1">
-                                <rect key="frame" x="18" y="156" width="99" height="18"/>
+                                <rect key="frame" x="18" y="112" width="99" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Show output" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="JsG-vr-NvJ">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -232,7 +233,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZlE-JP-X0A">
-                                <rect key="frame" x="18" y="136" width="125" height="18"/>
+                                <rect key="frame" x="18" y="92" width="125" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Use short names" bezelStyle="regularSquare" imagePosition="left" inset="2" id="vKb-op-Wi3">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -243,7 +244,7 @@
                                 </buttonCell>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KJp-ET-AkY">
-                                <rect key="frame" x="14" y="77" width="152" height="32"/>
+                                <rect key="frame" x="211" y="13" width="152" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Check for updates" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QPI-Pa-t6J">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -263,7 +264,7 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SXl-Ap-btO">
-                                <rect key="frame" x="18" y="116" width="274" height="18"/>
+                                <rect key="frame" x="18" y="72" width="274" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Auto-pause Spotify/iTunes on screen lock" bezelStyle="regularSquare" imagePosition="left" inset="2" id="bmE-Qd-abl">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -284,6 +285,24 @@
                                     <action selector="donatePayPal:" target="yVI-aX-W2l" id="N0O-YA-LcD"/>
                                 </connections>
                             </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CUk-Dh-Kjv">
+                                <rect key="frame" x="18" y="182" width="109" height="19"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="AudioDevice 2" id="yi0-sH-XS1">
+                                    <font key="font" metaFont="system" size="16"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rYO-Fp-acy">
+                                <rect key="frame" x="18" y="166" width="33" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="cyN-0O-EH7">
+                                    <font key="font" metaFont="smallSystem"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
                 </window>

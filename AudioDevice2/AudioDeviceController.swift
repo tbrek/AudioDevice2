@@ -52,6 +52,7 @@ class AudioDeviceController: NSObject {
     private weak var useShortNamesCheck: NSButton!
     private weak var autoPauseCheck: NSButton!
     private weak var buttonPayPal: NSButton!
+    private weak var labelVersion: NSTextField!
     
     override init() {
         type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
@@ -408,6 +409,7 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func openPreferences(_ sender: Any) {
+        labelVersion?.stringValue = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
         showOutputCheck?.state = showOutputDevice == true ? .on : .off
         showInputCheck?.state = showInputDevice == true ? .on : .off
         useShortNamesCheck?.state = useShortNames == true ? .on : .off
