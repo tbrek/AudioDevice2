@@ -33,6 +33,10 @@ Preferences menu:
 
 ## Changelog
 
+##### Version 2.3.7:
+
+* Bugfix - App would launch iTunes/Spotify when unlocking screen
+
 ##### Varsion 2.3.6:
 
 * Autopause control added to Preferences
