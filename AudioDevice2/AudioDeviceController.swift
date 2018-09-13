@@ -352,6 +352,7 @@ class AudioDeviceController: NSObject {
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
+        menu.item(withTitle: "Quit")?.isHidden = true
         updateMenu()
     }
     
@@ -492,6 +493,10 @@ class AudioDeviceController: NSObject {
 
 extension AudioDeviceController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
+        if NSEvent.modifierFlags.contains(NSEvent.ModifierFlags.option) {
+            menu.item(withTitle: "Quit")?.isHidden = false
+        }
+        
         getDeviceVolume()
     }
 }
