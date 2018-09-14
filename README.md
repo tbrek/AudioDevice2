@@ -1,4 +1,4 @@
-# AudioDevice2
+t# AudioDevice2
 
 How many times have you play music trough you speakers instead of headphones?
 
@@ -33,6 +33,11 @@ Preferences menu:
 
 ## Changelog
 
+##### Version 2.3.8:
+
+* Autoupdate checkbox added
+* Simplified menu: Quit/Preferences entries will show when Option key is down when clicking on the menu
+
 ##### Version 2.3.7:
 
 * Bugfix - App would launch iTunes/Spotify when unlocking screen
@@ -64,7 +69,7 @@ Preferences menu:
 
 ##### Version 2.1:
 
-Note: Now requires OS X 10.12 or later.
+Note: Now requires OS X 10.10 or later.
 
 * New volume indicator to save space in menu bar
 * New mute indicator

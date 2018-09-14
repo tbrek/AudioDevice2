@@ -304,14 +304,14 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pg8-OZ-KtR">
-                                <rect key="frame" x="18" y="50" width="211" height="18"/>
+                                <rect key="frame" x="18" y="50" width="217" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Check for update automatically" bezelStyle="regularSquare" imagePosition="left" inset="2" id="wBG-e2-gPU">
+                                <buttonCell key="cell" type="check" title="Automatically check for updates" bezelStyle="regularSquare" imagePosition="left" inset="2" id="wBG-e2-gPU">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="autoPauseClicked:" target="yVI-aX-W2l" id="G9Z-Rn-fbg"/>
+                                    <binding destination="MvV-TI-Zea" name="value" keyPath="automaticallyChecksForUpdates" id="EV2-F9-Ixc"/>
                                 </connections>
                             </button>
                         </subviews>

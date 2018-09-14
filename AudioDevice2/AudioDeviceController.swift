@@ -35,7 +35,7 @@ var type: String!
 var spotifyStatus: NSAppleEventDescriptor!
 var iTunesStatus: NSAppleEventDescriptor!
 let volumeItem = NSMenuItem()
-var audiodevicePath = "/Applications/Audiodevice2.app/Contents/Resources/audiodevice"
+var audiodevicePath: String!
 var urlPath: URL!
 var isSpotifyRunning: Bool!
 var isiTunesRunning: Bool!
@@ -75,7 +75,7 @@ class AudioDeviceController: NSObject {
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioOutputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
         timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
-        timer2 = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(checkifHeadphonesSpekers), userInfo: nil, repeats: true)
+        timer2 = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(checkifHeadphonesSpeakers), userInfo: nil, repeats: true)
         let center = DistributedNotificationCenter.default()
         center.addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name(rawValue: "com.apple.screenIsLocked"), object: nil)
         center.addObserver(self, selector: #selector(screenUnlocked), name: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"), object: nil)
@@ -278,7 +278,7 @@ class AudioDeviceController: NSObject {
         updateIcon()
     }
     
-    @objc func checkifHeadphonesSpekers() {
+    @objc func checkifHeadphonesSpeakers() {
         if (currentOutputDevice == "Internal Speakers" || currentOutputDevice == "Headphones") {
             reloadMenu()
         }
@@ -286,7 +286,7 @@ class AudioDeviceController: NSObject {
     
     
     @objc func updateIcon() {
-        
+       
         type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
         getDeviceVolume()
         var iconTemp = currentOutputDevice
@@ -353,6 +353,8 @@ class AudioDeviceController: NSObject {
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
         menu.item(withTitle: "Quit")?.isHidden = true
+        menu.item(withTitle: "Preferences...")?.isHidden = true
+
         updateMenu()
     }
     
@@ -402,9 +404,7 @@ class AudioDeviceController: NSObject {
         autoPause = autoPauseCheck.state == .on ? true : false
         defaults.set(autoPause, forKey: "autoPause")
     }
-    
-    
-    
+        
     @objc func openSoundPreferences(_ sender: Any) {
         NSWorkspace.shared.openFile("/System/Library/PreferencePanes/Sound.prefPane")
     }
@@ -493,8 +493,11 @@ class AudioDeviceController: NSObject {
 
 extension AudioDeviceController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
+        menu.item(withTitle: "Quit")?.isHidden = true
+        menu.item(withTitle: "Preferences...")?.isHidden = true
         if NSEvent.modifierFlags.contains(NSEvent.ModifierFlags.option) {
             menu.item(withTitle: "Quit")?.isHidden = false
+            menu.item(withTitle: "Preferences...")?.isHidden = false
         }
         
         getDeviceVolume()
