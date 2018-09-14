@@ -1,4 +1,4 @@
-t# AudioDevice2
+# AudioDevice2
 
 How many times have you play music trough you speakers instead of headphones?
 
