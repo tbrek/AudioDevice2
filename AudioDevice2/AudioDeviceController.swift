@@ -485,10 +485,6 @@ class AudioDeviceController: NSObject {
         propertyAddress.mElement = channels[1]
         AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &rightLevel)
     }
-
-    @objc func printVolume() {
-        print(currentOutputDevice, leftLevel, rightLevel)
-    }
 }
 
 extension AudioDeviceController: NSMenuDelegate {
