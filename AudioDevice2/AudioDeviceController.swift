@@ -72,7 +72,7 @@ class AudioDeviceController: NSObject {
         useShortNames = defaults.object(forKey: "useShortNames") as! Bool?
         self.setupItems()
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
-        NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioOutputDeviceDidChange)
+        NotificationCenter.addObserver(observer: self, selector: #selector(outputChanged), name: .audioOutputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
         timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
         timer2 = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(checkifHeadphonesSpeakers), userInfo: nil, repeats: true)
@@ -92,6 +92,12 @@ class AudioDeviceController: NSObject {
         timer2.invalidate()
     }
     
+    @objc func outputChanged() {
+        checkPlayers()
+        pausePlayers()
+        reloadMenu()
+    }
+    
     @objc func checkPlayers() {
         let ws = NSWorkspace.shared
         let apps = ws.runningApplications
@@ -108,29 +114,33 @@ class AudioDeviceController: NSObject {
             }
     }
     
+    @objc func pausePlayers() {
+        if (isSpotifyRunning == true) {
+            command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
+            commandObject = NSAppleScript(source: command)
+            spotifyStatus = commandObject!.executeAndReturnError(&error)
+            
+            command = "if application \"Spotify\" is running then tell application \"Spotify\" to pause"
+            commandObject = NSAppleScript(source: command)
+            commandObject!.executeAndReturnError(&error)
+        }
+        
+        if (isiTunesRunning == true) {
+            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
+            commandObject = NSAppleScript(source: command)
+            iTunesStatus = commandObject!.executeAndReturnError(&error)
+            
+            command = "if application \"iTunes\" is running then tell application \"iTunes\" to pause"
+            commandObject = NSAppleScript(source: command)
+            commandObject!.executeAndReturnError(&error)
+        }
+        
+    }
+    
     @objc func screenLocked() {
         if (autoPause == true) {
             checkPlayers()
-
-            if (isSpotifyRunning == true) {
-                command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
-                commandObject = NSAppleScript(source: command)
-                spotifyStatus = commandObject!.executeAndReturnError(&error)
-                
-                command = "if application \"Spotify\" is running then tell application \"Spotify\" to pause"
-                commandObject = NSAppleScript(source: command)
-                commandObject!.executeAndReturnError(&error)
-            }
-            
-            if (isiTunesRunning == true) {
-                command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
-                commandObject = NSAppleScript(source: command)
-                iTunesStatus = commandObject!.executeAndReturnError(&error)
-                
-                command = "if application \"iTunes\" is running then tell application \"iTunes\" to pause"
-                commandObject = NSAppleScript(source: command)
-                commandObject!.executeAndReturnError(&error)
-            }
+            pausePlayers()
         }
         
     }
