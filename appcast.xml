@@ -17,7 +17,7 @@
             <li>Bugfix - App would launch iTunes/Spotify when unlocking screen</li></p>
             <b>2.3.6</b><p>
             <li>Added autopause control to system preferences</li>
-            <li>App no longer crashes when opened outside of the /Applications folder</li></p>
+            <li>App no longer crashes when opened outside of the Applications folder</li></p>
             <b>2.3.5</b><p>
             <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li></p>
             <b>2.3.3</b><p>
@@ -48,7 +48,7 @@
             <li>Bugfix - App would launch iTunes/Spotify when unlocking screen</li></p>
             <b>2.3.6</b><p>
             <li>Added autopause control to system preferences</li>
-            <li>App no longer crashes when opened outside of the /Applications folder</li></p>
+            <li>App no longer crashes when opened outside of the Applications folder</li></p>
             <b>2.3.5</b><p>
             <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li></p>
             <b>2.3.3</b><p>
@@ -76,7 +76,7 @@
             <li>Bugfix - App would launch iTunes/Spotify when unlocking screen</li></p>
             <b>2.3.6</b><p>
             <li>Added autopause control to system preferences</li>
-            <li>App no longer crashes when opened outside of the /Applications folder</li></p>
+            <li>App no longer crashes when opened outside of the Applications folder</li></p>
             <b>2.3.5</b><p>
             <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li></p>
             <b>2.3.3</b><p>
@@ -102,7 +102,7 @@
           <description><![CDATA[
             <b>2.3.6</b><p>
             <li>Added autopause control to system preferences</li>
-            <li>App no longer crashes when opened outside of the /Applications folder</li></p>
+            <li>App no longer crashes when opened outside of the Applications folder</li></p>
             <b>2.3.5</b><p>
             <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li></p>
             <b>2.3.3</b><p>
