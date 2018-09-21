@@ -8,28 +8,26 @@
       <item>
           <title>Version 2.3.9</title>
           <description><![CDATA[
-            <b>2.3.9</b>
-            <p>
-            <li>Added autopause when output device changes</li>
-            </p>
-            <b>2.3.8</b>
+            <b>2.3.9</b><p>
+            <li>Added autopause when output device changes</li></p>
+            <b>2.3.8</b><p>
             <li>Autoupdate checkbox added</li>
-            <li>Simplified menu: Quit/Preferences entries will show when Option key is down when clicking on the menu</li>
-            <b>2.3.7</b>
-            <li>Bugfix - App would launch iTunes/Spotify when unlocking screen</li>
-            <b>2.3.6</b>
-            <li>Added autopause control to system preferences</li>
-            <li>App no longer crashes when opened outside of the /Applications folder
-            <b>2.3.5</b>
-            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li>
-            <b>2.3.3</b>
-            <li>Mojave update</li>
-            <b>2.3.1</b>
-            <li>Fixing headphones/speakers switch</li>
-            <b>2.3</b>
-            <li>Making app fully 64-bit</li>
-            <b>2.2</b>
-            <li>Added autoupdater</li>
+            <li>Simplified menu: Quit/Preferences entries will show when Option key is down when clicking on the menu</li></p>
+            <b>2.3.7</b><p>
+            <li>Bugfix - App would launch iTunes/Spotify when unlocking screen</li></p>
+            <b>2.3.6</b><p>
+            <li>Added autopause control to system preferences</li></p>
+            <li>App no longer crashes when opened outside of the /Applications folder</li></p>
+            <b>2.3.5</b><p>
+            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li></p>
+            <b>2.3.3</b><p>
+            <li>Mojave update</li></p>
+            <b>2.3.1</b><p>
+            <li>Fixing headphones/speakers switch</li></p>
+            <b>2.3</b><p>
+            <li>Making app fully 64-bit</li></p>
+            <b>2.2</b><p>
+            <li>Added autoupdater</li></p>
             ]]>
           </description>
           <!-- <sparkle:releaseNotesLink>
@@ -43,24 +41,24 @@
       <item>
           <title>Version 2.3.8</title>
           <description><![CDATA[
-            <b>2.3.8</b>
-            <li>Autoupdate checkbox added</li>
-            <li>Simplified menu: Quit/Preferences entries will show when Option key is down when clicking on the menu</li>
-            <b>2.3.7</b>
-            <li>Bugfix - App would launch iTunes/Spotify when unlocking screen</li>
-            <b>2.3.6</b>
+            <b>2.3.8</b><p>
+            <li>Autoupdate checkbox added</li></p>
+            <li>Simplified menu: Quit/Preferences entries will show when Option key is down when clicking on the menu</li></p>
+            <b>2.3.7</b><p>
+            <li>Bugfix - App would launch iTunes/Spotify when unlocking screen</li></p>
+            <b>2.3.6</b><p>
             <li>Added autopause control to system preferences</li>
-            <li>App no longer crashes when opened outside of the /Applications folder
-            <b>2.3.5</b>
-            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li>
-            <b>2.3.3</b>
-            <li>Mojave update</li>
-            <b>2.3.1</b>
-            <li>Fixing headphones/speakers switch</li>
-            <b>2.3</b>
-            <li>Making app fully 64-bit</li>
-            <b>2.2</b>
-            <li>Added autoupdater</li>
+            <li>App no longer crashes when opened outside of the /Applications folder</li></p>
+            <b>2.3.5</b><p>
+            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li></p>
+            <b>2.3.3</b><p>
+            <li>Mojave update</li></p>
+            <b>2.3.1</b><p>
+            <li>Fixing headphones/speakers switch</li></p>
+            <b>2.3</b><p>
+            <li>Making app fully 64-bit</li></p>
+            <b>2.2</b><p>
+            <li>Added autoupdater</li></p>
             ]]>
           </description>
           <!-- <sparkle:releaseNotesLink>
@@ -74,21 +72,21 @@
       <item>
           <title>Version 2.3.7</title>
           <description><![CDATA[
-            <b>2.3.7</b>
-            <li>Bugfix - App would launch iTunes/Spotify when unlocking screen</li>
-            <b>2.3.6</b>
+            <b>2.3.7</b><p>
+            <li>Bugfix - App would launch iTunes/Spotify when unlocking screen</li></p>
+            <b>2.3.6</b><p>
             <li>Added autopause control to system preferences</li>
-            <li>App no longer crashes when opened outside of the /Applications folder
-            <b>2.3.5</b>
-            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li>
-            <b>2.3.3</b>
-            <li>Mojave update</li>
-            <b>2.3.1</b>
-            <li>Fixing headphones/speakers switch</li>
-            <b>2.3</b>
-            <li>Making app fully 64-bit</li>
-            <b>2.2</b>
-            <li>Added autoupdater</li>
+            <li>App no longer crashes when opened outside of the /Applications folder</li></p>
+            <b>2.3.5</b><p>
+            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li></p>
+            <b>2.3.3</b><p>
+            <li>Mojave update</li></p>
+            <b>2.3.1</b><p>
+            <li>Fixing headphones/speakers switch</li></p>
+            <b>2.3</b><p>
+            <li>Making app fully 64-bit</li></p>
+            <b>2.2</b><p>
+            <li>Added autoupdater</li></p>
             ]]>
           </description>
           <!-- <sparkle:releaseNotesLink>
@@ -102,19 +100,19 @@
       <item>
           <title>Version 2.3.6</title>
           <description><![CDATA[
-            <b>2.3.6</b>
+            <b>2.3.6</b><p>
             <li>Added autopause control to system preferences</li>
-            <li>App no longer crashes when opened outside of the /Applications folder
-            <b>2.3.5</b>
-            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li>
-            <b>2.3.3</b>
-            <li>Mojave update</li>
-            <b>2.3.1</b>
-            <li>Fixing headphones/speakers switch</li>
-            <b>2.3</b>
-            <li>Making app fully 64-bit</li>
-            <b>2.2</b>
-            <li>Added autoupdater</li>
+            <li>App no longer crashes when opened outside of the /Applications folder</li></p>
+            <b>2.3.5</b><p>
+            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li></p>
+            <b>2.3.3</b><p>
+            <li>Mojave update</li></p>
+            <b>2.3.1</b><p>
+            <li>Fixing headphones/speakers switch</li></p>
+            <b>2.3</b><p>
+            <li>Making app fully 64-bit</li></p>
+            <b>2.2</b><p>
+            <li>Added autoupdater</li></p>
             ]]>
           </description>
           <!-- <sparkle:releaseNotesLink>
@@ -128,16 +126,16 @@
       <item>
           <title>Version 2.3.5</title>
           <description><![CDATA[
-            <b>2.3.5</b>
-            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li>
-            <b>2.3.3</b>
-            <li>Mojave update</li>
-            <b>2.3.1</b>
-            <li>Fixing headphones/speakers switch</li>
-            <b>2.3</b>
-            <li>Making app fully 64-bit</li>
-            <b>2.2</b>
-            <li>Added autoupdater</li>
+            <b>2.3.5</b><p>
+            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li></p>
+            <b>2.3.3</b><p>
+            <li>Mojave update</li></p>
+            <b>2.3.1</b><p>
+            <li>Fixing headphones/speakers switch</li></p>
+            <b>2.3</b><p>
+            <li>Making app fully 64-bit</li></p>
+            <b>2.2</b><p>
+            <li>Added autoupdater</li></p>
             ]]>
           </description>
           <!-- <sparkle:releaseNotesLink>
@@ -151,14 +149,14 @@
       <item>
           <title>Version 2.3.3</title>
           <description><![CDATA[
-            <b>2.3.3</b>
-            <li>Mojave update</li>
-            <b>2.3.1</b>
-            <li>Fixing headphones/speakers switch</li>
-            <b>2.3</b>
-            <li>Making app fully 64-bit</li>
-            <b>2.2</b>
-            <li>Added autoupdater</li>
+            <b>2.3.3</b><p>
+            <li>Mojave update</li></p>
+            <b>2.3.1</b><p>
+            <li>Fixing headphones/speakers switch</li></p>
+            <b>2.3</b><p>
+            <li>Making app fully 64-bit</li></p>
+            <b>2.2</b><p>
+            <li>Added autoupdater</li></p>
             ]]>
           </description>
           <!-- <sparkle:releaseNotesLink>
@@ -172,12 +170,12 @@
       <item>
           <title>Version 2.3.1</title>
           <description><![CDATA[
-            <b>2.3.1</b>
-            <li>Fixing headphones/speakers switch</li>
-            <b>2.3</b>
-            <li>Making app fully 64-bit</li>
-            <b>2.2</b>
-            <li>Added autoupdater</li>
+            <b>2.3.1</b><p>
+            <li>Fixing headphones/speakers switch</li></p>
+            <b>2.3</b><p>
+            <li>Making app fully 64-bit</li></p>
+            <b>2.2</b><p>
+            <li>Added autoupdater</li></p>
             ]]>
           </description>
           <!-- <sparkle:releaseNotesLink>
@@ -191,10 +189,10 @@
       <item>
           <title>Version 2.3</title>
           <description><![CDATA[
-            <b>2.3</b>
-            <li>Making app fully 64-bit</li>
-            <b>2.2</b>
-            <li>Added autoupdater</li>
+            <b>2.3</b><p>
+            <li>Making app fully 64-bit</li></p>
+            <b>2.2</b><p>
+            <li>Added autoupdater</li></p>
             ]]>
           </description>
           <!-- <sparkle:releaseNotesLink>
