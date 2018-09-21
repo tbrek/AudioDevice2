@@ -33,6 +33,10 @@ Preferences menu:
 
 ## Changelog
 
+##### Version 2.3.9:
+
+* Autopause when output changes added
+
 ##### Version 2.3.8:
 
 * Autoupdate checkbox added
