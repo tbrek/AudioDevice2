@@ -6,6 +6,41 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
       <item>
+          <title>Version 2.3.9</title>
+          <description><![CDATA[
+            <b>2.3.9</b>
+            <p>
+            <li>Added autopause when output device changes</li>
+            </p>
+            <b>2.3.8</b>
+            <li>Autoupdate checkbox added</li>
+            <li>Simplified menu: Quit/Preferences entries will show when Option key is down when clicking on the menu</li>
+            <b>2.3.7</b>
+            <li>Bugfix - App would launch iTunes/Spotify when unlocking screen</li>
+            <b>2.3.6</b>
+            <li>Added autopause control to system preferences</li>
+            <li>App no longer crashes when opened outside of the /Applications folder
+            <b>2.3.5</b>
+            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li>
+            <b>2.3.3</b>
+            <li>Mojave update</li>
+            <b>2.3.1</b>
+            <li>Fixing headphones/speakers switch</li>
+            <b>2.3</b>
+            <li>Making app fully 64-bit</li>
+            <b>2.2</b>
+            <li>Added autoupdater</li>
+            ]]>
+          </description>
+          <!-- <sparkle:releaseNotesLink>
+          </sparkle:releaseNotesLink> -->
+          <pubDate>Fri, 21 Sep 2018 08:00:00 +0000</pubDate>
+          <enclosure url="https://github.com/tbrek/AudioDevice2/releases/download/v2.3.9/AudioDevice.2.3.9.dmg"
+                     sparkle:version="2.3.9"
+                     length="0"
+                     type="application/octet-stream" />
+      </item>
+      <item>
           <title>Version 2.3.8</title>
           <description><![CDATA[
             <b>2.3.8</b>
