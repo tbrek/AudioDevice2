@@ -8,40 +8,48 @@ import CoreAudio
 import CoreImage
 import Quartz
 
-var trimmed1: String!
-var trimmed2: String!
+
+var audiodevicePath: String!
+var autoPauseOnScreenLock: Bool!
+var autoPauseOnOutputChange: Bool!
+var commandObject: NSAppleScript!
 var currentOutputDevice: String!
 var currentInputDevice: String!
+var deviceColor: NSColor!
+let defaults = UserDefaults.standard
 var inputsArray: [String]!
 var outputsArray: [String]!
 let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 150, height: 19))
 var leftLevel = Float32(-1)
 var rightLevel = Float32(-1)
 var icon: NSImage!
-var volumeIndicator: String!
-var volume = Float32(-1)
+var iTunesStatus: NSAppleEventDescriptor!
+
 var isMuted: Bool!
 var muteVal = Float32(-1)
 var showInputDevice: Bool!
 var showOutputDevice: Bool!
-var autoPause: Bool!
+var spotifyStatus: NSAppleEventDescriptor!
 var timer1: Timer!
 var timer2: Timer!
 var timer3: Timer!
-var useShortNames: Bool!
-var deviceColor: NSColor!
-let defaults = UserDefaults.standard
+var trimmed1: String!
+var trimmed2: String!
 var type: String!
-var spotifyStatus: NSAppleEventDescriptor!
-var iTunesStatus: NSAppleEventDescriptor!
+var useShortNames: Bool!
+
+var volumeIndicator: String!
+var volume = Float32(-1)
+
+
 let volumeItem = NSMenuItem()
-var audiodevicePath: String!
+
 var urlPath: URL!
 var isSpotifyRunning: Bool!
 var isiTunesRunning: Bool!
 var command: String!
 var error: NSDictionary?
-var commandObject: NSAppleScript!
+
 
 class AudioDeviceController: NSObject {
     var menu: NSMenu!
@@ -50,7 +58,8 @@ class AudioDeviceController: NSObject {
     private weak var showInputCheck: NSButton!
     private weak var showOutputCheck: NSButton!
     private weak var useShortNamesCheck: NSButton!
-    private weak var autoPauseCheck: NSButton!
+    private weak var autoPauseOnScreenLockCheck: NSButton!
+    private weak var autoPauseOnOutputChangeCheck: NSButton!
     private weak var buttonPayPal: NSButton!
     private weak var labelVersion: NSTextField!
     
@@ -66,7 +75,8 @@ class AudioDeviceController: NSObject {
         super.init()
         urlPath = Bundle.main.url(forResource: "audiodevice", withExtension: "")
         audiodevicePath = urlPath.path
-        autoPause = defaults.object(forKey: "autoPause") as! Bool?
+        autoPauseOnScreenLock = defaults.object(forKey: "autoPauseOnScreenLock") as! Bool?
+        autoPauseOnOutputChange = defaults.object(forKey: "autoPauseOnOutputChange") as! Bool?
         showOutputDevice = defaults.object(forKey: "showOutputDevice") as! Bool?
         showInputDevice  = defaults.object(forKey: "showInputDevice") as! Bool?
         useShortNames = defaults.object(forKey: "useShortNames") as! Bool?
@@ -93,8 +103,10 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func outputChanged() {
+    if (autoPauseOnOutputChange == true) {
         checkPlayers()
         pausePlayers()
+    }
         reloadMenu()
     }
     
@@ -138,7 +150,7 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func screenLocked() {
-        if (autoPause == true) {
+        if (autoPauseOnScreenLock == true) {
             checkPlayers()
             pausePlayers()
         }
@@ -410,9 +422,14 @@ class AudioDeviceController: NSObject {
         updateMenu()
     }
     
-    @IBAction func autoPauseClicked(_ sender: Any) {
-        autoPause = autoPauseCheck.state == .on ? true : false
-        defaults.set(autoPause, forKey: "autoPause")
+    @IBAction func autoPauseOnScreenClicked(_ sender: Any) {
+        autoPauseOnScreenLock = autoPauseOnScreenLockCheck.state == .on ? true : false
+        defaults.set(autoPauseOnScreenLock, forKey: "autoPauseOnScreenLock")
+    }
+    
+    @IBAction func autoPauseOnOutputChangeClicked(_ sender: Any) {
+        autoPauseOnOutputChange = autoPauseOnOutputChangeCheck.state == .on ? true : false
+        defaults.set(autoPauseOnOutputChange, forKey: "autoPauseOnOutputChange")
     }
         
     @objc func openSoundPreferences(_ sender: Any) {
@@ -424,7 +441,7 @@ class AudioDeviceController: NSObject {
         showOutputCheck?.state = showOutputDevice == true ? .on : .off
         showInputCheck?.state = showInputDevice == true ? .on : .off
         useShortNamesCheck?.state = useShortNames == true ? .on : .off
-        autoPauseCheck?.state = autoPause == true ? .on : .off
+        autoPauseOnScreenLockCheck?.state = autoPauseOnScreenLock == true ? .on : .off
         self.preferencesWindow.orderFrontRegardless()
     }
     

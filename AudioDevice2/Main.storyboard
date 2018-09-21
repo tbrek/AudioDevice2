@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -191,7 +191,8 @@
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="AudioDevice2" customModuleProvider="target"/>
                 <customObject id="yVI-aX-W2l" customClass="AudioDeviceController" customModule="AudioDevice2" customModuleProvider="target">
                     <connections>
-                        <outlet property="autoPauseCheck" destination="SXl-Ap-btO" id="swn-Y3-31q"/>
+                        <outlet property="autoPauseOnOutputChangeCheck" destination="GU6-aZ-2CS" id="iq6-BR-N2c"/>
+                        <outlet property="autoPauseOnScreenLockCheck" destination="SXl-Ap-btO" id="mOk-na-Kb0"/>
                         <outlet property="buttonPayPal" destination="tiy-Ab-W7o" id="h1Q-YV-LJK"/>
                         <outlet property="labelVersion" destination="rYO-Fp-acy" id="lUZ-o4-rHb"/>
                         <outlet property="preferencesWindow" destination="FaA-Je-di8" id="8S8-n1-zGI"/>
@@ -201,17 +202,17 @@
                     </connections>
                 </customObject>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="FaA-Je-di8">
+                <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="FaA-Je-di8">
                     <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
                     <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                    <rect key="contentRect" x="1128" y="633" width="377" height="212"/>
+                    <rect key="contentRect" x="1128" y="633" width="377" height="249"/>
                     <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
                     <view key="contentView" wantsLayer="YES" id="UV8-tf-aOc">
-                        <rect key="frame" x="0.0" y="0.0" width="377" height="212"/>
+                        <rect key="frame" x="0.0" y="0.0" width="377" height="249"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3YA-AE-Y6x">
-                                <rect key="frame" x="18" y="132" width="90" height="18"/>
+                                <rect key="frame" x="18" y="169" width="90" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Show input" bezelStyle="regularSquare" imagePosition="left" inset="2" id="JoA-tt-xAl">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -222,7 +223,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q7d-Cp-wZ1">
-                                <rect key="frame" x="18" y="112" width="99" height="18"/>
+                                <rect key="frame" x="18" y="149" width="99" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Show output" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="JsG-vr-NvJ">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -233,7 +234,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZlE-JP-X0A">
-                                <rect key="frame" x="18" y="92" width="125" height="18"/>
+                                <rect key="frame" x="18" y="129" width="125" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Use short names" bezelStyle="regularSquare" imagePosition="left" inset="2" id="vKb-op-Wi3">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -244,7 +245,7 @@
                                 </buttonCell>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KJp-ET-AkY">
-                                <rect key="frame" x="211" y="13" width="152" height="32"/>
+                                <rect key="frame" x="211" y="0.0" width="152" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Check for updates" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QPI-Pa-t6J">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -255,7 +256,7 @@
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bHD-Sc-ILD">
-                                <rect key="frame" x="20" y="20" width="77" height="17"/>
+                                <rect key="frame" x="20" y="7" width="77" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Donate with" id="VSC-XT-hwY">
                                     <font key="font" metaFont="system"/>
@@ -264,18 +265,18 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SXl-Ap-btO">
-                                <rect key="frame" x="18" y="72" width="274" height="18"/>
+                                <rect key="frame" x="18" y="109" width="274" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Auto-pause Spotify/iTunes on screen lock" bezelStyle="regularSquare" imagePosition="left" inset="2" id="bmE-Qd-abl">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="autoPauseClicked:" target="yVI-aX-W2l" id="kIc-Jf-ADs"/>
+                                    <action selector="autoPauseOnScreenClicked:" target="yVI-aX-W2l" id="Gzz-4Z-rco"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tiy-Ab-W7o">
-                                <rect key="frame" x="85" y="12" width="69" height="32"/>
+                                <rect key="frame" x="85" y="-1" width="69" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="bevel" title="PayPal" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="bqc-hC-nep">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -286,7 +287,7 @@
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CUk-Dh-Kjv">
-                                <rect key="frame" x="18" y="182" width="109" height="19"/>
+                                <rect key="frame" x="18" y="219" width="109" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="AudioDevice 2" id="yi0-sH-XS1">
                                     <font key="font" metaFont="system" size="16"/>
@@ -295,7 +296,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rYO-Fp-acy">
-                                <rect key="frame" x="18" y="166" width="33" height="14"/>
+                                <rect key="frame" x="18" y="203" width="33" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="cyN-0O-EH7">
                                     <font key="font" metaFont="smallSystem"/>
@@ -304,7 +305,7 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pg8-OZ-KtR">
-                                <rect key="frame" x="18" y="50" width="217" height="18"/>
+                                <rect key="frame" x="18" y="37" width="217" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Automatically check for updates" bezelStyle="regularSquare" imagePosition="left" inset="2" id="wBG-e2-gPU">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -312,6 +313,17 @@
                                 </buttonCell>
                                 <connections>
                                     <binding destination="MvV-TI-Zea" name="value" keyPath="automaticallyChecksForUpdates" id="EV2-F9-Ixc"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GU6-aZ-2CS">
+                                <rect key="frame" x="18" y="89" width="293" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Auto-pause Spotify/iTunes on output change" bezelStyle="regularSquare" imagePosition="left" inset="2" id="PJa-Wf-EMi">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="autoPauseOnOutputChangeClicked:" target="yVI-aX-W2l" id="ZuR-jI-Nqj"/>
                                 </connections>
                             </button>
                         </subviews>
