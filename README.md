@@ -33,6 +33,12 @@ Preferences menu:
 
 ## Changelog
 
+##### Version 2.4.0:
+
+* Mojave compatibility update. **Please allow AudioDevice2 to control iTunes/Spotify one the first start**
+
+![security]
+
 ##### Version 2.3.9:
 
 * Autopause when output changes added
@@ -85,4 +91,6 @@ The [MIT License](LICENSE).
 [menu]: /images/menu.png
 [preferences]: /images/preferences.png
 [appdemo]: /images/appdemo.gif
+[security]: /images/security.png
+
 

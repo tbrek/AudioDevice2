@@ -8,7 +8,6 @@ import CoreAudio
 import CoreImage
 import Quartz
 
-
 var audiodevicePath: String!
 var autoPauseOnScreenLock: Bool!
 var autoPauseOnOutputChange: Bool!
@@ -16,7 +15,7 @@ var commandObject: NSAppleScript!
 var currentOutputDevice: String!
 var currentInputDevice: String!
 var deviceColor: NSColor!
-let defaults = UserDefaults.standard
+var defaults = UserDefaults.standard
 var inputsArray: [String]!
 var outputsArray: [String]!
 let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 150, height: 19))
@@ -45,8 +44,8 @@ var volume = Float32(-1)
 let volumeItem = NSMenuItem()
 
 var urlPath: URL!
-var isSpotifyRunning: Bool!
-var isiTunesRunning: Bool!
+var isSpotifyRunning: Bool = false
+var isiTunesRunning: Bool = false
 var command: String!
 var error: NSDictionary?
 
@@ -64,6 +63,21 @@ class AudioDeviceController: NSObject {
     private weak var labelVersion: NSTextField!
     
     override init() {
+        
+        let launchedBefore = defaults.bool(forKey: "launchedBefore")
+        if launchedBefore  {
+            // Not a first launch
+        }
+        else {
+            // First launch, setting up defaults file
+            defaults.set(true, forKey: "launchedBefore")
+            defaults.set(true, forKey: "showInputDevice")
+            defaults.set(true, forKey: "showOutputDevice")
+            defaults.set(true, forKey: "useShortNames")
+            defaults.set(true, forKey: "autoPauseOnOutputChange")
+            defaults.set(true, forKey: "autoPauseOnScreenLock")
+        }
+    
         type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
         let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 170, height: 19))
                 volumeSliderView.addSubview(volumeSlider)
@@ -75,11 +89,11 @@ class AudioDeviceController: NSObject {
         super.init()
         urlPath = Bundle.main.url(forResource: "audiodevice", withExtension: "")
         audiodevicePath = urlPath.path
-        autoPauseOnScreenLock = defaults.object(forKey: "autoPauseOnScreenLock") as! Bool?
+        autoPauseOnScreenLock   = defaults.object(forKey: "autoPauseOnScreenLock") as! Bool?
         autoPauseOnOutputChange = defaults.object(forKey: "autoPauseOnOutputChange") as! Bool?
-        showOutputDevice = defaults.object(forKey: "showOutputDevice") as! Bool?
-        showInputDevice  = defaults.object(forKey: "showInputDevice") as! Bool?
-        useShortNames = defaults.object(forKey: "useShortNames") as! Bool?
+        showOutputDevice        = defaults.object(forKey: "showOutputDevice") as! Bool?
+        showInputDevice         = defaults.object(forKey: "showInputDevice") as! Bool?
+        useShortNames           = defaults.object(forKey: "useShortNames") as! Bool?
         self.setupItems()
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(outputChanged), name: .audioOutputDeviceDidChange)
@@ -89,6 +103,7 @@ class AudioDeviceController: NSObject {
         let center = DistributedNotificationCenter.default()
         center.addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name(rawValue: "com.apple.screenIsLocked"), object: nil)
         center.addObserver(self, selector: #selector(screenUnlocked), name: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"), object: nil)
+        checkPlayers()
     }
 
     deinit {
@@ -107,7 +122,7 @@ class AudioDeviceController: NSObject {
         checkPlayers()
         pausePlayers()
     }
-        reloadMenu()
+    reloadMenu()
     }
     
     @objc func checkPlayers() {
@@ -431,6 +446,8 @@ class AudioDeviceController: NSObject {
         autoPauseOnOutputChange = autoPauseOnOutputChangeCheck.state == .on ? true : false
         defaults.set(autoPauseOnOutputChange, forKey: "autoPauseOnOutputChange")
     }
+    
+    
         
     @objc func openSoundPreferences(_ sender: Any) {
         NSWorkspace.shared.openFile("/System/Library/PreferencePanes/Sound.prefPane")
@@ -442,6 +459,7 @@ class AudioDeviceController: NSObject {
         showInputCheck?.state = showInputDevice == true ? .on : .off
         useShortNamesCheck?.state = useShortNames == true ? .on : .off
         autoPauseOnScreenLockCheck?.state = autoPauseOnScreenLock == true ? .on : .off
+        autoPauseOnOutputChangeCheck?.state = autoPauseOnOutputChange == true ? .on : .off
         self.preferencesWindow.orderFrontRegardless()
     }
     
@@ -522,8 +540,6 @@ extension AudioDeviceController: NSMenuDelegate {
             menu.item(withTitle: "Quit")?.isHidden = false
             menu.item(withTitle: "Preferences...")?.isHidden = false
         }
-        
         getDeviceVolume()
     }
 }
-

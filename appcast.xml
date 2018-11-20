@@ -6,6 +6,41 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
       <item>
+          <title>Version 2.4.0</title>
+          <description><![CDATA[
+            <b>2.4.0</b><p>
+            <li>Updated for Mojave. Please allow app to control Spotify and iTunes on the first start</li></p>
+            <b>2.3.9</b><p>
+            <li>Added autopause when output device changes</li></p>
+            <b>2.3.8</b><p>
+            <li>Autoupdate checkbox added</li>
+            <li>Simplified menu: Quit/Preferences entries will show when Option key is down when clicking on the menu</li></p>
+            <b>2.3.7</b><p>
+            <li>Bugfix - App would launch iTunes/Spotify when unlocking screen</li></p>
+            <b>2.3.6</b><p>
+            <li>Added autopause control to system preferences</li>
+            <li>App no longer crashes when opened outside of the Applications folder</li></p>
+            <b>2.3.5</b><p>
+            <li>AudioDevice can pause Spotify and iTunes when screen is locked. Music will be resumed when screen is unlocked.</li></p>
+            <b>2.3.3</b><p>
+            <li>Mojave update</li></p>
+            <b>2.3.1</b><p>
+            <li>Fixing headphones/speakers switch</li></p>
+            <b>2.3</b><p>
+            <li>Making app fully 64-bit</li></p>
+            <b>2.2</b><p>
+            <li>Added autoupdater</li></p>
+            ]]>
+          </description>
+          <!-- <sparkle:releaseNotesLink>
+          </sparkle:releaseNotesLink> -->
+          <pubDate>Thu, 27 Sep 2018 08:00:00 +0000</pubDate>
+          <enclosure url="https://github.com/tbrek/AudioDevice2/releases/download/v2.4.0/AudioDevice.2.4.0.dmg"
+                     sparkle:version="2.4.0"
+                     length="0"
+                     type="application/octet-stream" />
+      </item>
+      <item>
           <title>Version 2.3.9</title>
           <description><![CDATA[
             <b>2.3.9</b><p>
