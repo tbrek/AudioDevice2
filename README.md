@@ -1,6 +1,6 @@
 # AudioDevice2
 
-Download latest versions [here][download]
+Download latest version from [here][download]
 
 How many times have you play music trough you speakers instead of headphones?
 
