@@ -1,5 +1,7 @@
 # AudioDevice2
 
+Download latest versions here ![download]
+
 How many times have you play music trough you speakers instead of headphones?
 
 This comes as a little helper. It's small menu bar application which shows current output device.
@@ -92,5 +94,5 @@ The [MIT License](LICENSE).
 [preferences]: /images/preferences.png
 [appdemo]: /images/appdemo.gif
 [security]: /images/security.png
-
+[download]: https://github.com/tbrek/AudioDevice2/releases/latest
 
