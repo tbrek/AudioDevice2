@@ -307,7 +307,6 @@
                         </subviews>
                     </view>
                 </window>
-                <customObject id="MvV-TI-Zea" customClass="SUUpdater"/>
             </objects>
             <point key="canvasLocation" x="208" y="-78"/>
         </scene>
