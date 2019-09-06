@@ -7,6 +7,7 @@ import CoreServices
 import CoreAudio
 import CoreImage
 import Quartz
+import AudioToolbox
 
 var audiodevicePath: String!
 var autoPauseOnScreenLock: Bool!
@@ -276,6 +277,8 @@ class AudioDeviceController: NSObject {
                 trimmed1 = "Head"
             case "Internal Speakers"?:
                 trimmed1 = "Int. Speak."
+            case "MacBook Pro Speakers"?:
+                trimmed1 = "MB Speak."
             default:
                 trimmed1 = String(trimmed1.prefix(4))
             }
@@ -288,6 +291,8 @@ class AudioDeviceController: NSObject {
                 trimmed2 = "Ext. Mic"
             case "Internal Microphone"?:
                 trimmed2 = "Int. Mic"
+            case "MacBook Pro Microphone"?:
+                trimmed2 = "MB Mic"
             default:
                 trimmed2 = String(trimmed2.prefix(4))
             }
@@ -295,8 +300,8 @@ class AudioDeviceController: NSObject {
         
         if (showOutputDevice == true) && (showInputDevice == true) {
             trimmed1 = trimmed1 + "\n"
-            let outputDevice = NSAttributedString(string: trimmed1, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
-            let inputDevice = NSAttributedString(string: trimmed2, attributes: [ NSAttributedStringKey.font: NSFont.systemFont(ofSize: 7)])
+            let outputDevice = NSAttributedString(string: trimmed1, attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 7)])
+            let inputDevice = NSAttributedString(string: trimmed2, attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 7)])
             let combination = NSMutableAttributedString()
             combination.append(outputDevice)
             combination.append(inputDevice)
@@ -316,7 +321,7 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func checkifHeadphonesSpeakers() {
-        if (currentOutputDevice == "Internal Speakers" || currentOutputDevice == "Headphones") {
+        if (currentOutputDevice == "Internal Speakers" || currentOutputDevice == "Headphones" || currentOutputDevice == "MacBook Pro Speakers") {
             reloadMenu()
         }
     }
@@ -343,15 +348,17 @@ class AudioDeviceController: NSObject {
         }
         switch iconTemp {
         case "BT"?:
-            icon = NSImage(named: NSImage.Name(rawValue: type + "_Bluetooth" + volumeIndicator))
+            icon = NSImage(named: type + "_Bluetooth" + volumeIndicator)
         case "Internal Speakers"?:
-            icon = NSImage(named: NSImage.Name(rawValue: type + "_Speakers" + volumeIndicator))
+            icon = NSImage(named: type + "_Speakers" + volumeIndicator)
+        case "MacBook Pro Speakers"?:
+            icon = NSImage(named: type + "_Speakers" + volumeIndicator)
         case "Display Audio"?:
-            icon = NSImage(named: NSImage.Name(rawValue: type + "_Display" + volumeIndicator))
+            icon = NSImage(named: type + "_Display" + volumeIndicator)
         case "Headphones"?:
-            icon = NSImage(named: NSImage.Name(rawValue: type + "_Headphones" + volumeIndicator))
+            icon = NSImage(named: type + "_Headphones" + volumeIndicator)
         default:
-            icon = NSImage(named: NSImage.Name(rawValue: type + "_Default" + volumeIndicator))
+            icon = NSImage(named: type + "_Default" + volumeIndicator)
         }
         statusItem.image = icon
     }
@@ -472,6 +479,9 @@ class AudioDeviceController: NSObject {
     }
     
     func getDeviceVolume() {
+        
+        // check if it's muted
+        
         var propertySize = UInt32(MemoryLayout<AudioDeviceID>.size)
         var deviceID = kAudioDeviceUnknown
         var propertyAddress = AudioObjectPropertyAddress(
@@ -488,47 +498,121 @@ class AudioDeviceController: NSObject {
         else {
             isMuted = true
         }
-        let channelsCount = 2
-        var channels = [UInt32](repeating: 0, count: channelsCount)
-        propertySize = UInt32(MemoryLayout<UInt32>.size * channelsCount)
-        propertyAddress = AudioObjectPropertyAddress(
-            mSelector: AudioObjectPropertySelector(kAudioDevicePropertyPreferredChannelsForStereo),
-            mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+        
+        
+        var defaultOutputDeviceID = AudioDeviceID(0)
+        var defaultOutputDeviceIDSize = UInt32(MemoryLayout.size(ofValue: defaultOutputDeviceID))
+        
+        var getDefaultOutputDevicePropertyAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDefaultOutputDevice,
+            mScope: kAudioObjectPropertyScopeGlobal,
             mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
-        _ = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &channels)
-        propertyAddress.mSelector = kAudioDevicePropertyVolumeScalar
-        propertySize = UInt32(MemoryLayout<Float32>.size)
-        propertyAddress.mElement = channels[0]
-        AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &leftLevel)
-        propertyAddress.mElement = channels[1]
-        AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &rightLevel)
-        volumeSlider.floatValue = leftLevel
+        
+        AudioObjectGetPropertyData(
+            AudioObjectID(kAudioObjectSystemObject),
+            &getDefaultOutputDevicePropertyAddress,
+            0,
+            nil,
+            &defaultOutputDeviceIDSize,
+            &defaultOutputDeviceID)
+        
+        
+        var volume = Float32(0.0)
+        var volumeSize = UInt32(MemoryLayout.size(ofValue: volume))
+        
+        var volumePropertyAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMasterVolume,
+            mScope: kAudioDevicePropertyScopeOutput,
+            mElement: kAudioObjectPropertyElementMaster)
+        
+        AudioObjectGetPropertyData(
+            defaultOutputDeviceID,
+            &volumePropertyAddress,
+            0,
+            nil,
+            &volumeSize,
+            &volume)
+        volumeSlider.floatValue = volume
+//        print(volume)
+        
+//        let channelsCount = 2
+//        var channels = [UInt32](repeating: 0, count: channelsCount)
+//        propertySize = UInt32(MemoryLayout<UInt32>.size * channelsCount)
+//        propertyAddress = AudioObjectPropertyAddress(
+//            mSelector: AudioObjectPropertySelector(kAudioDevicePropertyPreferredChannelsForStereo),
+//            mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+//            mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
+//        _ = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &channels)
+//        propertyAddress.mSelector = kAudioDevicePropertyVolumeScalar
+//        propertySize = UInt32(MemoryLayout<Float32>.size)
+//        propertyAddress.mElement = channels[0]
+//        AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &leftLevel)
+//        propertyAddress.mElement = channels[1]
+//        AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &rightLevel)
+//        volumeSlider.floatValue = rightLevel
+//        NSLog("Left channel: %f", leftLevel)
+//        NSLog("Rigth channel: %f", rightLevel)
+//        NSLog("Mute val: %f", muteVal)
     }
     
     @objc func setDeviceVolume(slider: NSSlider) {
-        var propertySize = UInt32(MemoryLayout<AudioDeviceID>.size)
-        var deviceID = kAudioDeviceUnknown
-        var propertyAddress = AudioObjectPropertyAddress(
-            mSelector: AudioObjectPropertySelector(kAudioHardwarePropertyDefaultOutputDevice),
-            mScope: AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal),
+        
+        var defaultOutputDeviceID = AudioDeviceID(0)
+        var defaultOutputDeviceIDSize = UInt32(MemoryLayout.size(ofValue: defaultOutputDeviceID))
+        
+        var getDefaultOutputDevicePropertyAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDefaultOutputDevice,
+            mScope: kAudioObjectPropertyScopeGlobal,
             mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
-        AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &propertyAddress, 0, nil, &propertySize, &deviceID)
-        let channelsCount = 2
-        var channels = [UInt32](repeating: 0, count: channelsCount)
-        propertySize = UInt32(MemoryLayout<UInt32>.size * channelsCount)
-        leftLevel = slider.floatValue
-        rightLevel = slider.floatValue
-        propertyAddress = AudioObjectPropertyAddress(
-            mSelector: AudioObjectPropertySelector(kAudioDevicePropertyPreferredChannelsForStereo),
-            mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-            mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
-        _ = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &channels)
-        propertyAddress.mSelector = kAudioDevicePropertyVolumeScalar
-        propertySize = UInt32(MemoryLayout<Float32>.size)
-        propertyAddress.mElement = channels[0]
-        AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &leftLevel)
-        propertyAddress.mElement = channels[1]
-        AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &rightLevel)
+        
+        AudioObjectGetPropertyData(
+            AudioObjectID(kAudioObjectSystemObject),
+            &getDefaultOutputDevicePropertyAddress,
+            0,
+            nil,
+            &defaultOutputDeviceIDSize,
+            &defaultOutputDeviceID)
+        
+        var volume = Float32(0.50) // 0.0 ... 1.0
+        var volumeSize = UInt32(MemoryLayout.size(ofValue: volume))
+        
+        var volumePropertyAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMasterVolume,
+            mScope: kAudioDevicePropertyScopeOutput,
+            mElement: kAudioObjectPropertyElementMaster)
+        
+        volume = slider.floatValue
+        AudioObjectSetPropertyData(
+            defaultOutputDeviceID,
+            &volumePropertyAddress,
+            0,
+            nil,
+            volumeSize,
+            &volume)
+        
+//        var propertySize = UInt32(MemoryLayout<AudioDeviceID>.size)
+//        var deviceID = kAudioDeviceUnknown
+//        var propertyAddress = AudioObjectPropertyAddress(
+//            mSelector: AudioObjectPropertySelector(kAudioHardwarePropertyDefaultOutputDevice),
+//            mScope: AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal),
+//            mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
+//        AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &propertyAddress, 0, nil, &propertySize, &deviceID)
+//        let channelsCount = 2
+//        var channels = [UInt32](repeating: 0, count: channelsCount)
+//        propertySize = UInt32(MemoryLayout<UInt32>.size * channelsCount)
+//        leftLevel = slider.floatValue
+//        rightLevel = slider.floatValue
+//        propertyAddress = AudioObjectPropertyAddress(
+//            mSelector: AudioObjectPropertySelector(kAudioDevicePropertyPreferredChannelsForStereo),
+//            mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+//            mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
+//        _ = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, nil, &propertySize, &channels)
+//        propertyAddress.mSelector = kAudioDevicePropertyVolumeScalar
+//        propertySize = UInt32(MemoryLayout<Float32>.size)
+//        propertyAddress.mElement = channels[0]
+//        AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &leftLevel)
+//        propertyAddress.mElement = channels[1]
+//        AudioObjectSetPropertyData(deviceID, &propertyAddress, 0, nil, propertySize, &rightLevel)
     }
 }
 
