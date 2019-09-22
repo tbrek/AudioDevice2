@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -206,7 +206,7 @@
                     <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
                     <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                     <rect key="contentRect" x="1128" y="633" width="377" height="249"/>
-                    <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
+                    <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
                     <view key="contentView" wantsLayer="YES" id="UV8-tf-aOc">
                         <rect key="frame" x="0.0" y="0.0" width="377" height="249"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -244,19 +244,8 @@
                                     </connections>
                                 </buttonCell>
                             </button>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KJp-ET-AkY">
-                                <rect key="frame" x="211" y="0.0" width="152" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="push" title="Check for updates" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QPI-Pa-t6J">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="checkForUpdates:" target="MvV-TI-Zea" id="1LE-Pz-FuU"/>
-                                </connections>
-                            </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bHD-Sc-ILD">
-                                <rect key="frame" x="20" y="7" width="77" height="17"/>
+                                <rect key="frame" x="20" y="57" width="77" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Donate with" id="VSC-XT-hwY">
                                     <font key="font" metaFont="system"/>
@@ -276,7 +265,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tiy-Ab-W7o">
-                                <rect key="frame" x="85" y="-1" width="69" height="32"/>
+                                <rect key="frame" x="85" y="50" width="69" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="bevel" title="PayPal" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="bqc-hC-nep">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -304,17 +293,6 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pg8-OZ-KtR">
-                                <rect key="frame" x="18" y="37" width="217" height="18"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Automatically check for updates" bezelStyle="regularSquare" imagePosition="left" inset="2" id="wBG-e2-gPU">
-                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="MvV-TI-Zea" name="value" keyPath="automaticallyChecksForUpdates" id="EV2-F9-Ixc"/>
-                                </connections>
-                            </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GU6-aZ-2CS">
                                 <rect key="frame" x="18" y="89" width="293" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -329,7 +307,6 @@
                         </subviews>
                     </view>
                 </window>
-                <customObject id="MvV-TI-Zea" customClass="SUUpdater"/>
             </objects>
             <point key="canvasLocation" x="208" y="-78"/>
         </scene>
