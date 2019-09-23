@@ -45,6 +45,14 @@ let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 170, height: 19))
 let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 130, height: 19))
 let volumeItem = NSMenuItem()
 
+var mediaControlsView = NSView(frame: NSRect(x: 0, y:0, width: 170, height:19))
+//var mediaControlPreviousImageView    = NSImageView(frame: NSRect(x: 0, y: 0, width: 20, height: 19))
+//var mediaControlPlayPauseImageView   = NSImageView(frame:  NSRect(x: 20, y: 0, width: 20, height: 19))
+//var mediaControlStopImageView        = NSImageView(frame: NSRect(x: 40, y: 0, width: 20, height: 19))
+//var mediaControlNextImageView        = NSImageView(frame: NSRect(x: 60, y: 0, width: 20, height: 19))
+
+var mediaItem = NSMenuItem()
+
 var urlPath: URL!
 var isSpotifyRunning: Bool = false
 var isiTunesRunning: Bool = false
@@ -88,6 +96,17 @@ class AudioDeviceController: NSObject {
         volumeSlider.floatValue = 0.5
         volumeItem.view = volumeSliderView
         volumeSlider.isContinuous = true
+        
+        // Setup mediaControls
+        
+        
+
+        //        mediaItem.image = mediaControlImageView.image
+//        mediaItem.title = "Test"
+//        mediaItem.offStateImage = mediaControlImageView.image
+//        mediaItem.onStateImage = mediaControlImageView.image
+//        mediaItem.isEnabled = true
+        
         super.init()
         urlPath = Bundle.main.url(forResource: "audiodevice", withExtension: "")
         audiodevicePath = urlPath.path
@@ -117,6 +136,26 @@ class AudioDeviceController: NSObject {
         center.removeObserver(self, forKeyPath: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked").rawValue)
         timer1.invalidate()
         timer2.invalidate()
+    }
+    
+    @objc func saySomething() {
+        NSLog("Saying something")
+    }
+    
+    @objc func stop() {
+        NSLog("Stop")
+    }
+    
+    @objc func playPause() {
+        NSLog("Play/Pause")
+    }
+    
+    @objc func next() {
+        NSLog("Next")
+    }
+    
+    @objc func previous() {
+        NSLog("Previous")
     }
     
     @objc func outputChanged() {
@@ -391,6 +430,57 @@ class AudioDeviceController: NSObject {
                 return item
                 }())
         }
+        self.menu.addItem(NSMenuItem.separator())
+        
+        // Create media controls\
+//        mediaControlsView.removeFromSuperview()
+        mediaControlsView.setFrameSize(NSSize(width: menu.size.width, height: 19))
+//        mediaControlPreviousImageView.image = NSImage(named: "Dark_Default_0")
+//        mediaControlPreviousImageView.action = #selector(donatePayPal(_:))
+//        mediaControlPreviousImageView.isEnabled = true
+//        mediaControlStopImageView.image = NSImage(named: "Dark_Default_25")
+//        mediaControlPlayPauseImageView.image = NSImage(named: "Dark_Default_50")
+//        mediaControlNextImageView.image = NSImage(named: "Dark_Default_100")
+        var middle = mediaControlsView.frame.size.width / 2
+        
+        var mediaControlPreviousButton       = NSButton(frame: NSRect(x: middle-40, y: 0, width: 20, height: 19))
+        var mediaControlStopButton           = NSButton(frame: NSRect(x: middle-20, y: 0, width: 20, height: 19))
+        var mediaControlPlayPauseButton      = NSButton(frame: NSRect(x: middle, y: 0, width: 20, height: 19))
+        var mediaControlNextButton           = NSButton(frame: NSRect(x: middle+20, y: 0, width: 20, height: 19))
+        
+        mediaControlPreviousButton.image = NSImage(named: "Dark_Default_0")
+        mediaControlPreviousButton.target = self
+        mediaControlPreviousButton.action = #selector(previous)
+        mediaControlPreviousButton.isBordered = false
+        mediaControlsView.addSubview(mediaControlPreviousButton)
+        
+        mediaControlStopButton.image = NSImage(named: "Dark_Default_25")
+        mediaControlStopButton.target = self
+        mediaControlStopButton.action = #selector(stop)
+        mediaControlStopButton.isBordered = false
+        mediaControlsView.addSubview(mediaControlStopButton)
+        
+        
+        mediaControlPlayPauseButton.image = NSImage(named: "Dark_Default_50")
+        mediaControlPlayPauseButton.target = self
+        mediaControlPlayPauseButton.action = #selector(playPause)
+        mediaControlPlayPauseButton.isBordered = false
+        mediaControlsView.addSubview(mediaControlPlayPauseButton)
+        
+        mediaControlNextButton.image = NSImage(named: "Dark_Default_100")
+        mediaControlNextButton.target = self
+        mediaControlNextButton.action = #selector(next)
+        mediaControlNextButton.isBordered = false
+        mediaControlsView.addSubview(mediaControlNextButton)
+        
+//        mediaControlsView.addSubview(mediaControlPreviousImageView)
+//        mediaControlsView.addSubview(mediaControlStopImageView)
+//        mediaControlsView.addSubview(mediaControlPlayPauseImageView)
+//        mediaControlsView.addSubview(mediaControlNextImageView)
+        mediaItem.view = mediaControlsView
+        
+        
+        self.menu.addItem(mediaItem)
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: "Sound Preferences...", target: self, action: #selector(openSoundPreferences(_:))))
         self.menu.addItem(NSMenuItem(title: "Preferences...", target: self, action: #selector(openPreferences(_:))))
