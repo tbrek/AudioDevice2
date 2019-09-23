@@ -19,7 +19,7 @@ var deviceColor: NSColor!
 var defaults = UserDefaults.standard
 var inputsArray: [String]!
 var outputsArray: [String]!
-let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 150, height: 19))
+
 var leftLevel = Float32(-1)
 var rightLevel = Float32(-1)
 var icon: NSImage!
@@ -41,7 +41,8 @@ var useShortNames: Bool!
 var volumeIndicator: String!
 var volume = Float32(-1)
 
-
+let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 170, height: 19))
+let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 130, height: 19))
 let volumeItem = NSMenuItem()
 
 var urlPath: URL!
@@ -80,13 +81,13 @@ class AudioDeviceController: NSObject {
         }
     
         type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
-        let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 170, height: 19))
-                volumeSliderView.addSubview(volumeSlider)
-                volumeSlider.minValue = 0.0
-                volumeSlider.maxValue = 1
-                volumeSlider.floatValue = 0.5
-                volumeItem.view = volumeSliderView
-                volumeSlider.isContinuous = true
+        // Setup volumeSlider
+        volumeSliderView.addSubview(volumeSlider)
+        volumeSlider.minValue = 0.0
+        volumeSlider.maxValue = 1
+        volumeSlider.floatValue = 0.5
+        volumeItem.view = volumeSliderView
+        volumeSlider.isContinuous = true
         super.init()
         urlPath = Bundle.main.url(forResource: "audiodevice", withExtension: "")
         audiodevicePath = urlPath.path
@@ -399,6 +400,10 @@ class AudioDeviceController: NSObject {
         menu.item(withTitle: "Quit")?.isHidden = true
         menu.item(withTitle: "Preferences...")?.isHidden = true
 
+        // Reisze volumeSliderView & volumeSlider if needed
+        volumeSliderView.setFrameSize(NSSize(width: self.menu.size.width, height: 19))
+        volumeSlider.setFrameSize(NSSize(width: volumeSliderView.frame.size.width-40, height: 19))
+        
         updateMenu()
     }
     
