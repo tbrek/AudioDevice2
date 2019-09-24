@@ -30,6 +30,8 @@ var muteVal = Float32(-1)
 var showInputDevice: Bool!
 var showOutputDevice: Bool!
 var spotifyStatus: NSAppleEventDescriptor!
+var currentTrackTitle: NSAppleEventDescriptor!
+var currentTrackArtist: NSAppleEventDescriptor!
 var timer1: Timer!
 var timer2: Timer!
 var timer3: Timer!
@@ -96,7 +98,6 @@ class AudioDeviceController: NSObject {
         volumeSlider.floatValue = 0.5
         volumeItem.view = volumeSliderView
         volumeSlider.isContinuous = true
-                
         super.init()
         urlPath = Bundle.main.url(forResource: "audiodevice", withExtension: "")
         audiodevicePath = urlPath.path
@@ -105,6 +106,7 @@ class AudioDeviceController: NSObject {
         showOutputDevice        = defaults.object(forKey: "showOutputDevice") as! Bool?
         showInputDevice         = defaults.object(forKey: "showInputDevice") as! Bool?
         useShortNames           = defaults.object(forKey: "useShortNames") as! Bool?
+        checkPlayers()
         self.setupItems()
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(outputChanged), name: .audioOutputDeviceDidChange)
@@ -114,7 +116,7 @@ class AudioDeviceController: NSObject {
         let center = DistributedNotificationCenter.default()
         center.addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name(rawValue: "com.apple.screenIsLocked"), object: nil)
         center.addObserver(self, selector: #selector(screenUnlocked), name: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"), object: nil)
-        checkPlayers()
+        
     }
 
     deinit {
@@ -137,6 +139,19 @@ class AudioDeviceController: NSObject {
             mediaControlPlayPauseButton.image = NSImage(named: "dark-play")
             resumePlayers()
         }
+    }
+    
+    func refreshNowPlaying () {
+        command = "tell application \"Spotify\" to set spotifyState to name of the current track"
+        commandObject = NSAppleScript(source: command)
+        currentTrackTitle = commandObject!.executeAndReturnError(&error)
+        NSLog((currentTrackTitle?.stringValue)!)
+        command = "tell application \"Spotify\" to set spotifyState to artist of the current track"
+        commandObject = NSAppleScript(source: command)
+        currentTrackArtist = commandObject!.executeAndReturnError(&error)
+        NSLog((currentTrackArtist?.stringValue)!)
+        
+        
     }
     
     @objc func next() {
@@ -208,6 +223,7 @@ class AudioDeviceController: NSObject {
                     } else {
                         mediaControlPlayPauseButton.image = NSImage(named: "dark-play")
                     }
+                    refreshNowPlaying()
                 }
                 if (currentApp.localizedName == "iTunes") {
                     isiTunesRunning = true
@@ -499,17 +515,15 @@ class AudioDeviceController: NSObject {
         }
         self.menu.addItem(NSMenuItem.separator())
         
+        self.menu.addItem(NSMenuItem(title: (currentTrackArtist?.stringValue)! + " - "))
         // Create media controls\
 
         mediaControlsView.setFrameSize(NSSize(width: menu.size.width, height: 19))
-
-
         mediaControlPreviousButton.image = NSImage(named: "dark-previous")
         mediaControlPreviousButton.target = self
         mediaControlPreviousButton.action = #selector(previous)
         mediaControlPreviousButton.isBordered = false
         mediaControlsView.addSubview(mediaControlPreviousButton)
-        
         mediaControlPlayPauseButton.image = NSImage(named: "dark-play")
         mediaControlPlayPauseButton.target = self
         mediaControlPlayPauseButton.action = #selector(playPause)
@@ -521,12 +535,11 @@ class AudioDeviceController: NSObject {
         mediaControlNextButton.action = #selector(next)
         mediaControlNextButton.isBordered = false
         mediaControlsView.addSubview(mediaControlNextButton)
-        
         mediaItem.view = mediaControlsView
-        
-        
         self.menu.addItem(mediaItem)
+        
         self.menu.addItem(NSMenuItem.separator())
+        
         self.menu.addItem(NSMenuItem(title: "Sound Preferences...", target: self, action: #selector(openSoundPreferences(_:))))
         self.menu.addItem(NSMenuItem(title: "Preferences...", target: self, action: #selector(openPreferences(_:))))
         self.menu.addItem(NSMenuItem.separator())
