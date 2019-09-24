@@ -53,6 +53,8 @@ let mediaControlPlayPauseButton      = NSButton(frame: NSRect(x: middle, y: 0, w
 let mediaControlNextButton           = NSButton(frame: NSRect(x: middle+50, y: 0, width: 19, height: 19))
 var mediaControlsView                = NSView(frame: NSRect(x: 0, y:0, width: 170, height:19))
 var mediaItem = NSMenuItem()
+var nowPlaying = NSMenuItem(title: "  ", action: nil)
+
 
 var urlPath: URL!
 var isSpotifyRunning: Bool = false
@@ -132,11 +134,13 @@ class AudioDeviceController: NSObject {
         
     @objc func playPause() {
         checkPlayers()
-        if (spotifyStatus?.stringValue == "playing") {
+        if (isSpotifyPlaying == true) {
             mediaControlPlayPauseButton.image = NSImage(named: "dark-pause")
+            nowPlaying.isEnabled = true
             pausePlayers()
         } else {
             mediaControlPlayPauseButton.image = NSImage(named: "dark-play")
+            nowPlaying.isEnabled = true
             resumePlayers()
         }
     }
@@ -152,6 +156,16 @@ class AudioDeviceController: NSObject {
         NSLog((currentTrackArtist?.stringValue)!)
         
         
+        let nowPlayingTitle = NSAttributedString(string: currentTrackTitle!.stringValue ?? "", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
+        let nowPlayingArtist = NSAttributedString(string: currentTrackArtist!.stringValue ?? "", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 11)])
+        let combination = NSMutableAttributedString()
+        combination.append(nowPlayingTitle)
+        combination.append(NSAttributedString(string: "\n"))
+        combination.append(nowPlayingArtist)
+        combination.append(NSAttributedString(string: "\n"))
+        nowPlaying.attributedTitle = combination
+        nowPlaying.isEnabled = true
+
     }
     
     @objc func next() {
@@ -163,6 +177,7 @@ class AudioDeviceController: NSObject {
             command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
             commandObject = NSAppleScript(source: command)
             spotifyStatus = commandObject!.executeAndReturnError(&error)
+            refreshNowPlaying()
         }
         
         if (isiTunesRunning == true) {
@@ -173,6 +188,7 @@ class AudioDeviceController: NSObject {
             command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
             commandObject = NSAppleScript(source: command)
             iTunesStatus = commandObject!.executeAndReturnError(&error)
+            refreshNowPlaying()
         }
     }
     
@@ -185,6 +201,7 @@ class AudioDeviceController: NSObject {
             command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
             commandObject = NSAppleScript(source: command)
             spotifyStatus = commandObject!.executeAndReturnError(&error)
+            refreshNowPlaying()
         }
         
         if (isiTunesRunning == true) {
@@ -195,6 +212,7 @@ class AudioDeviceController: NSObject {
             command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
             commandObject = NSAppleScript(source: command)
             iTunesStatus = commandObject!.executeAndReturnError(&error)
+            refreshNowPlaying()
         }
     }
     
@@ -220,8 +238,11 @@ class AudioDeviceController: NSObject {
                     spotifyStatus = commandObject!.executeAndReturnError(&error)
                     if (spotifyStatus?.stringValue == "playing") {
                         mediaControlPlayPauseButton.image = NSImage(named: "dark-pause")
+                        nowPlaying.isEnabled = true
+                        isSpotifyPlaying = true
                     } else {
                         mediaControlPlayPauseButton.image = NSImage(named: "dark-play")
+                        isSpotifyPlaying = false
                     }
                     refreshNowPlaying()
                 }
@@ -232,6 +253,7 @@ class AudioDeviceController: NSObject {
                     iTunesStatus = commandObject!.executeAndReturnError(&error)
                     if (iTunesStatus?.stringValue == "playing") {
                         mediaControlPlayPauseButton.image = NSImage(named: "dark-pause")
+                        nowPlaying.isEnabled = true
                     } else {
                         mediaControlPlayPauseButton.image = NSImage(named: "dark-play")
                     }
@@ -245,9 +267,10 @@ class AudioDeviceController: NSObject {
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
             mediaControlPlayPauseButton.image = NSImage(named: "dark-pause")
-            command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
-            commandObject = NSAppleScript(source: command)
-            spotifyStatus = commandObject!.executeAndReturnError(&error)
+//            command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
+//            commandObject = NSAppleScript(source: command)
+//            spotifyStatus = commandObject!.executeAndReturnError(&error)
+            isSpotifyPlaying = true
         }
         
         if (isiTunesRunning == true) {
@@ -255,32 +278,35 @@ class AudioDeviceController: NSObject {
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
             mediaControlPlayPauseButton.image = NSImage(named: "dark-pause")
-            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
-            commandObject = NSAppleScript(source: command)
-            iTunesStatus = commandObject!.executeAndReturnError(&error)
+//            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
+//            commandObject = NSAppleScript(source: command)
+//            iTunesStatus = commandObject!.executeAndReturnError(&error)
+            isiTunesPlaying = true
         }
     }
     
     
     @objc func pausePlayers() {
         if (isSpotifyRunning == true) {
-            command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
-            commandObject = NSAppleScript(source: command)
-            spotifyStatus = commandObject!.executeAndReturnError(&error)
+//            command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
+//            commandObject = NSAppleScript(source: command)
+//            spotifyStatus = commandObject!.executeAndReturnError(&error)
             command = "if application \"Spotify\" is running then tell application \"Spotify\" to pause"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
             mediaControlPlayPauseButton.image = NSImage(named: "dark-play")
+            isSpotifyPlaying = false
         }
         
         if (isiTunesRunning == true) {
-            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
-            commandObject = NSAppleScript(source: command)
-            iTunesStatus = commandObject!.executeAndReturnError(&error)
+//            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
+//            commandObject = NSAppleScript(source: command)
+//            iTunesStatus = commandObject!.executeAndReturnError(&error)
             command = "if application \"iTunes\" is running then tell application \"iTunes\" to pause"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
             mediaControlPlayPauseButton.image = NSImage(named: "dark-play")
+            isiTunesPlaying = false
         }
     }
     
@@ -322,7 +348,6 @@ class AudioDeviceController: NSObject {
             item.menu = self.menu
             return item
         }()
-        statusItem.action = #selector(checkPlayers)
         reloadMenu()
     }
 
@@ -444,8 +469,7 @@ class AudioDeviceController: NSObject {
     
     @objc func checkifHeadphonesSpeakers() {
         if (currentOutputDevice == "Internal Speakers" || currentOutputDevice == "Headphones" || currentOutputDevice == "MacBook Pro Speakers") {
-            checkPlayers()
-           
+//            reloadMenu()
         }
     }
     
@@ -515,7 +539,16 @@ class AudioDeviceController: NSObject {
         }
         self.menu.addItem(NSMenuItem.separator())
         
-        self.menu.addItem(NSMenuItem(title: (currentTrackArtist?.stringValue)! + " - "))
+
+        let nowPlayingHeader = NSMenuItem(title: "", action:nil)
+        nowPlayingHeader.attributedTitle = NSAttributedString(string: "Now playing:", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
+        self.menu.addItem(nowPlayingHeader)
+        
+        self.menu.addItem(nowPlaying)
+        nowPlaying.action = #selector(openPreferences(_:))
+        nowPlaying.target = self
+        
+        nowPlaying.attributedTitle = NSAttributedString(string: "", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
         // Create media controls\
 
         mediaControlsView.setFrameSize(NSSize(width: menu.size.width, height: 19))
@@ -529,7 +562,6 @@ class AudioDeviceController: NSObject {
         mediaControlPlayPauseButton.action = #selector(playPause)
         mediaControlPlayPauseButton.isBordered = false
         mediaControlsView.addSubview(mediaControlPlayPauseButton)
-        checkPlayers()
         mediaControlNextButton.image = NSImage(named: "dark-next")
         mediaControlNextButton.target = self
         mediaControlNextButton.action = #selector(next)
@@ -729,6 +761,7 @@ extension AudioDeviceController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
         menu.item(withTitle: "Quit")?.isHidden = true
         menu.item(withTitle: "Preferences...")?.isHidden = true
+        
         if NSEvent.modifierFlags.contains(NSEvent.ModifierFlags.option) {
             menu.item(withTitle: "Quit")?.isHidden = false
             menu.item(withTitle: "Preferences...")?.isHidden = false
