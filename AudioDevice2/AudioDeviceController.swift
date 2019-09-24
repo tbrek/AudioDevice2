@@ -153,8 +153,7 @@ class AudioDeviceController: NSObject {
         command = "tell application \"Spotify\" to set spotifyState to artist of the current track"
         commandObject = NSAppleScript(source: command)
         currentTrackArtist = commandObject!.executeAndReturnError(&error)
-        NSLog((currentTrackArtist?.stringValue)!)
-        
+        NSLog((currentTrackArtist?.stringValue)!)        
         
         let nowPlayingTitle = NSAttributedString(string: currentTrackTitle!.stringValue ?? "", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
         let nowPlayingArtist = NSAttributedString(string: currentTrackArtist!.stringValue ?? "", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 11)])
