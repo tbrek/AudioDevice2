@@ -44,7 +44,7 @@ var volumeIndicator: String!
 var volume = Float32(-1)
 
 let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 225, height: 19))
-let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 195, height: 19))
+let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 185, height: 19))
 let volumeItem = NSMenuItem()
 var middle = 112
 let mediaControlPreviousButton       = NSButton(frame: NSRect(x: 62, y: 0, width: 19, height: 19))
@@ -166,7 +166,7 @@ class AudioDeviceController: NSObject {
         }
         combination.append(NSAttributedString(string: "\n"))
         combination.append(nowPlayingArtist)
-        combination.append(NSAttributedString(string: "\n"))
+        combination.append(NSAttributedString(string: "\n", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 6)]))
         nowPlaying.attributedTitle = combination
         nowPlaying.isEnabled = true
 
