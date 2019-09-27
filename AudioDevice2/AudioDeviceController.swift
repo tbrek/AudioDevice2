@@ -12,6 +12,7 @@ import AudioToolbox
 var audiodevicePath: String!
 var autoPauseOnScreenLock: Bool!
 var autoPauseOnOutputChange: Bool!
+var hideAppPrefs: Bool!
 var commandObject: NSAppleScript!
 var currentOutputDevice: String!
 var currentInputDevice: String!
@@ -37,7 +38,7 @@ var timer2: Timer!
 var timer3: Timer!
 var trimmed1: String!
 var trimmed2: String!
-var type: String!
+
 var useShortNames: Bool!
 
 var volumeIndicator: String!
@@ -69,6 +70,7 @@ class AudioDeviceController: NSObject {
     private weak var preferencesWindow: NSWindow!
     private weak var showInputCheck: NSButton!
     private weak var showOutputCheck: NSButton!
+    private weak var hideAppPrefsCheck: NSButton!
     private weak var useShortNamesCheck: NSButton!
     private weak var autoPauseOnScreenLockCheck: NSButton!
     private weak var autoPauseOnOutputChangeCheck: NSButton!
@@ -79,6 +81,7 @@ class AudioDeviceController: NSObject {
         
         let launchedBefore = defaults.bool(forKey: "launchedBefore")
         if launchedBefore  {
+//            hideAppPrefsCheck?.state = hideAppPrefs == true ? .on : .off
             // Not a first launch
         }
         else {
@@ -89,9 +92,9 @@ class AudioDeviceController: NSObject {
             defaults.set(true, forKey: "useShortNames")
             defaults.set(true, forKey: "autoPauseOnOutputChange")
             defaults.set(true, forKey: "autoPauseOnScreenLock")
+            defaults.set(true, forKey: "hideAppPrefs")
         }
     
-        type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
         // Setup volumeSlider
         volumeSliderView.addSubview(volumeSlider)
         volumeSlider.minValue = 0.0
@@ -107,6 +110,7 @@ class AudioDeviceController: NSObject {
         showOutputDevice        = defaults.object(forKey: "showOutputDevice") as! Bool?
         showInputDevice         = defaults.object(forKey: "showInputDevice") as! Bool?
         useShortNames           = defaults.object(forKey: "useShortNames") as! Bool?
+        hideAppPrefs            = defaults.object(forKey: "hideAppPrefs") as! Bool?
         checkPlayers()
         self.setupItems()
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
@@ -481,7 +485,7 @@ class AudioDeviceController: NSObject {
     
     @objc func updateIcon() {
 //        checkPlayers()
-        type = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
+
         getDeviceVolume()
         var iconTemp = currentOutputDevice
         volume = volumeSlider.floatValue
@@ -500,17 +504,17 @@ class AudioDeviceController: NSObject {
         }
         switch iconTemp {
         case "BT"?:
-            icon = NSImage(named: type + "_Bluetooth" + volumeIndicator)
+            icon = NSImage(named: "Bluetooth" + volumeIndicator)
         case "Internal Speakers"?:
-            icon = NSImage(named: type + "_Speakers" + volumeIndicator)
+            icon = NSImage(named: "Speakers" + volumeIndicator)
         case "MacBook Pro Speakers"?:
-            icon = NSImage(named: type + "_Speakers" + volumeIndicator)
+            icon = NSImage(named: "Speakers" + volumeIndicator)
         case "Display Audio"?:
-            icon = NSImage(named: type + "_Display" + volumeIndicator)
+            icon = NSImage(named: "Display" + volumeIndicator)
         case "Headphones"?:
-            icon = NSImage(named: type + "_Headphones" + volumeIndicator)
+            icon = NSImage(named: "Headphones" + volumeIndicator)
         default:
-            icon = NSImage(named: type + "_Default" + volumeIndicator)
+            icon = NSImage(named: "Default" + volumeIndicator)
         }
         statusItem.image = icon
         
@@ -655,6 +659,10 @@ class AudioDeviceController: NSObject {
         defaults.set(autoPauseOnOutputChange, forKey: "autoPauseOnOutputChange")
     }
     
+    @IBAction func hideAppPrefsClicked(_ sender: Any) {
+        hideAppPrefs = hideAppPrefsCheck.state == .on ? true : false
+        defaults.set(hideAppPrefs, forKey: "hideAppPrefs")
+    }
     
         
     @objc func openSoundPreferences(_ sender: Any) {
@@ -666,6 +674,7 @@ class AudioDeviceController: NSObject {
         showOutputCheck?.state = showOutputDevice == true ? .on : .off
         showInputCheck?.state = showInputDevice == true ? .on : .off
         useShortNamesCheck?.state = useShortNames == true ? .on : .off
+        hideAppPrefsCheck?.state = hideAppPrefs == true ? .on : .off
         autoPauseOnScreenLockCheck?.state = autoPauseOnScreenLock == true ? .on : .off
         autoPauseOnOutputChangeCheck?.state = autoPauseOnOutputChange == true ? .on : .off
         self.preferencesWindow.orderFrontRegardless()
@@ -775,13 +784,21 @@ class AudioDeviceController: NSObject {
 
 extension AudioDeviceController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
-        menu.item(withTitle: "Quit")?.isHidden = true
-        menu.item(withTitle: "Preferences...")?.isHidden = true
+        
+        if (hideAppPrefs == true ) {
+            menu.item(withTitle: "Quit")?.isHidden = true
+            menu.item(withTitle: "Preferences...")?.isHidden = true
+        } else {
+            menu.item(withTitle: "Quit")?.isHidden = false
+            menu.item(withTitle: "Preferences...")?.isHidden = false
+        }
         
         if NSEvent.modifierFlags.contains(NSEvent.ModifierFlags.option) {
             menu.item(withTitle: "Quit")?.isHidden = false
             menu.item(withTitle: "Preferences...")?.isHidden = false
         }
+        
+        
         if (isSpotifyRunning == false && isiTunesRunning == false) {
             nowPlaying.attributedTitle = NSAttributedString(string: "No active media player")
             mediaControlPlayPauseButton.isEnabled = false
