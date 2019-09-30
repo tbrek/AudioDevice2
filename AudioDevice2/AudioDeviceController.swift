@@ -24,6 +24,7 @@ var outputsArray: [String]!
 var leftLevel = Float32(-1)
 var rightLevel = Float32(-1)
 var icon: NSImage!
+var iconName: String!
 var iTunesStatus: NSAppleEventDescriptor!
 
 var isMuted: Bool!
@@ -426,30 +427,34 @@ class AudioDeviceController: NSObject {
         getCurrentOutput()
         if (useShortNames == true) {
             switch trimmed1 {
+            case let str where str!.contains("AirPods"):
+                trimmed1 = "AirPods"
             case "Display Audio"?:
-                trimmed1 = "Disp. Audio"
+                trimmed1 = "Display"
             case "Bose OE"?:
                 trimmed1 = "Bose"
             case "Headphones"?:
                 trimmed1 = "Head"
             case "Internal Speakers"?:
-                trimmed1 = "Int. Speak."
+                trimmed1 = "IntSpk"
             case "MacBook Pro Speakers"?:
-                trimmed1 = "MB Speak."
+                trimmed1 = "IntSpk"
             default:
                 trimmed1 = String(trimmed1.prefix(4))
             }
             switch trimmed2 {
+            case let str where str!.contains("AirPods"):
+                trimmed2 = "AirPods"
             case "Display Audio"?:
-                trimmed2 = "Disp. Audio"
+                trimmed2 = "Display"
             case "Bose OE"?:
                 trimmed2 = "Bose"
             case "External Microphone"?:
                 trimmed2 = "Ext. Mic"
             case "Internal Microphone"?:
-                trimmed2 = "Int. Mic"
+                trimmed2 = "IntMic"
             case "MacBook Pro Microphone"?:
-                trimmed2 = "MB Mic"
+                trimmed2 = "IntMic"
             default:
                 trimmed2 = String(trimmed2.prefix(4))
             }
@@ -487,7 +492,7 @@ class AudioDeviceController: NSObject {
 //        checkPlayers()
 
         getDeviceVolume()
-        var iconTemp = currentOutputDevice
+        let iconTemp: String = currentOutputDevice
         volume = volumeSlider.floatValue
         if isMuted == true                      {
             volumeIndicator = "_muted"
@@ -499,24 +504,25 @@ class AudioDeviceController: NSObject {
             if (volume >= 0.75)                      { volumeIndicator = "_100" }
             if (volume == 0)                         { volumeIndicator = "_0"   }
         }
-        if ((iconTemp?.range(of: "BT") != nil) || (iconTemp?.range(of: "Bose") != nil)) {
-            iconTemp = "BT"
-        }
+
+        
         switch iconTemp {
-        case "BT"?:
-            icon = NSImage(named: "Bluetooth" + volumeIndicator)
-        case "Internal Speakers"?:
-            icon = NSImage(named: "Speakers" + volumeIndicator)
-        case "MacBook Pro Speakers"?:
-            icon = NSImage(named: "Speakers" + volumeIndicator)
-        case "Display Audio"?:
-            icon = NSImage(named: "Display" + volumeIndicator)
-        case "Headphones"?:
-            icon = NSImage(named: "Headphones" + volumeIndicator)
+        case let str where str.contains("AirPods"):
+            iconName =  "Airpods"
+        case let str where str.contains("BT"):
+            iconName = "Bluetooth"
+        case let str where str.contains("Bose"):
+            iconName = "Bluetooth"
+        case "Internal Speakers", "MacBook Pro Speakers":
+            iconName =  "Speakers"
+        case "Display Audio":
+            iconName = "Display"
+        case "Headphones":
+            iconName = "Headphones"
         default:
-            icon = NSImage(named: "Default" + volumeIndicator)
+            iconName = "Default"
         }
-        statusItem.image = icon
+        statusItem.image = NSImage(named: iconName + volumeIndicator)
         
     }
     
