@@ -25,13 +25,15 @@ var leftLevel = Float32(-1)
 var rightLevel = Float32(-1)
 var icon: NSImage!
 var iconName: String!
-var iTunesStatus: NSAppleEventDescriptor!
+
 
 var isMuted: Bool!
 var muteVal = Float32(-1)
 var showInputDevice: Bool!
 var showOutputDevice: Bool!
+
 var spotifyStatus: NSAppleEventDescriptor!
+var iTunesStatus: NSAppleEventDescriptor!
 var currentTrackTitle: NSAppleEventDescriptor!
 var currentTrackArtist: NSAppleEventDescriptor!
 var timer1: Timer!
@@ -140,11 +142,9 @@ class AudioDeviceController: NSObject {
         checkPlayers()
         if (isSpotifyPlaying == true) {
             mediaControlPlayPauseButton.image = NSImage(named: "Pause")
-            nowPlaying.isEnabled = true
             pausePlayers()
         } else {
             mediaControlPlayPauseButton.image = NSImage(named: "Play")
-            nowPlaying.isEnabled = true
             resumePlayers()
         }
     }
@@ -153,11 +153,9 @@ class AudioDeviceController: NSObject {
         command = "tell application \"Spotify\" to set spotifyState to name of the current track"
         commandObject = NSAppleScript(source: command)
         currentTrackTitle = commandObject!.executeAndReturnError(&error)
-//        NSLog((currentTrackTitle?.stringValue)!)
         command = "tell application \"Spotify\" to set spotifyState to artist of the current track"
         commandObject = NSAppleScript(source: command)
         currentTrackArtist = commandObject!.executeAndReturnError(&error)
-//        NSLog((currentTrackArtist?.stringValue)!)
         let nowPlayingTitleShort = (currentTrackTitle!.stringValue ?? "").prefix(25)
         let nowPlayingArtistShort = (currentTrackArtist!.stringValue ?? "").prefix(25)
 
@@ -167,7 +165,7 @@ class AudioDeviceController: NSObject {
         
         combination.append(nowPlayingTitle)
         if (nowPlayingTitleShort.count == 25) {
-            combination.append(NSAttributedString(string: "..."))
+            combination.append(NSAttributedString(string: "...", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)]))
         }
         combination.append(NSAttributedString(string: "\n"))
         combination.append(nowPlayingArtist)
