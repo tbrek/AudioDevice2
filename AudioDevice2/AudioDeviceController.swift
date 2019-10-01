@@ -24,13 +24,16 @@ var outputsArray: [String]!
 var leftLevel = Float32(-1)
 var rightLevel = Float32(-1)
 var icon: NSImage!
-var iTunesStatus: NSAppleEventDescriptor!
+var iconName: String!
+
 
 var isMuted: Bool!
 var muteVal = Float32(-1)
 var showInputDevice: Bool!
 var showOutputDevice: Bool!
+
 var spotifyStatus: NSAppleEventDescriptor!
+var iTunesStatus: NSAppleEventDescriptor!
 var currentTrackTitle: NSAppleEventDescriptor!
 var currentTrackArtist: NSAppleEventDescriptor!
 var timer1: Timer!
@@ -139,11 +142,9 @@ class AudioDeviceController: NSObject {
         checkPlayers()
         if (isSpotifyPlaying == true) {
             mediaControlPlayPauseButton.image = NSImage(named: "Pause")
-            nowPlaying.isEnabled = true
             pausePlayers()
         } else {
             mediaControlPlayPauseButton.image = NSImage(named: "Play")
-            nowPlaying.isEnabled = true
             resumePlayers()
         }
     }
@@ -152,11 +153,9 @@ class AudioDeviceController: NSObject {
         command = "tell application \"Spotify\" to set spotifyState to name of the current track"
         commandObject = NSAppleScript(source: command)
         currentTrackTitle = commandObject!.executeAndReturnError(&error)
-//        NSLog((currentTrackTitle?.stringValue)!)
         command = "tell application \"Spotify\" to set spotifyState to artist of the current track"
         commandObject = NSAppleScript(source: command)
         currentTrackArtist = commandObject!.executeAndReturnError(&error)
-//        NSLog((currentTrackArtist?.stringValue)!)
         let nowPlayingTitleShort = (currentTrackTitle!.stringValue ?? "").prefix(25)
         let nowPlayingArtistShort = (currentTrackArtist!.stringValue ?? "").prefix(25)
 
@@ -166,7 +165,7 @@ class AudioDeviceController: NSObject {
         
         combination.append(nowPlayingTitle)
         if (nowPlayingTitleShort.count == 25) {
-            combination.append(NSAttributedString(string: "..."))
+            combination.append(NSAttributedString(string: "...", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)]))
         }
         combination.append(NSAttributedString(string: "\n"))
         combination.append(nowPlayingArtist)
@@ -266,6 +265,7 @@ class AudioDeviceController: NSObject {
                         nowPlaying.isEnabled = true
                     } else {
                         mediaControlPlayPauseButton.image = NSImage(named: "Play")
+                        isiTunesPlaying = false
                     }
                 }
             }
@@ -277,9 +277,6 @@ class AudioDeviceController: NSObject {
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
             mediaControlPlayPauseButton.image = NSImage(named: "Pause")
-//            command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
-//            commandObject = NSAppleScript(source: command)
-//            spotifyStatus = commandObject!.executeAndReturnError(&error)
             isSpotifyPlaying = true
         }
         
@@ -288,9 +285,7 @@ class AudioDeviceController: NSObject {
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
             mediaControlPlayPauseButton.image = NSImage(named: "Pause")
-//            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
-//            commandObject = NSAppleScript(source: command)
-//            iTunesStatus = commandObject!.executeAndReturnError(&error)
+
             isiTunesPlaying = true
         }
     }
@@ -298,9 +293,6 @@ class AudioDeviceController: NSObject {
     
     @objc func pausePlayers() {
         if (isSpotifyRunning == true) {
-//            command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
-//            commandObject = NSAppleScript(source: command)
-//            spotifyStatus = commandObject!.executeAndReturnError(&error)
             command = "if application \"Spotify\" is running then tell application \"Spotify\" to pause"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
@@ -309,9 +301,6 @@ class AudioDeviceController: NSObject {
         }
         
         if (isiTunesRunning == true) {
-//            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
-//            commandObject = NSAppleScript(source: command)
-//            iTunesStatus = commandObject!.executeAndReturnError(&error)
             command = "if application \"iTunes\" is running then tell application \"iTunes\" to pause"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
@@ -426,30 +415,34 @@ class AudioDeviceController: NSObject {
         getCurrentOutput()
         if (useShortNames == true) {
             switch trimmed1 {
+            case let str where str!.contains("AirPods"):
+                trimmed1 = "AirPods"
             case "Display Audio"?:
-                trimmed1 = "Disp. Audio"
+                trimmed1 = "Display"
             case "Bose OE"?:
                 trimmed1 = "Bose"
             case "Headphones"?:
                 trimmed1 = "Head"
             case "Internal Speakers"?:
-                trimmed1 = "Int. Speak."
+                trimmed1 = "IntSpk"
             case "MacBook Pro Speakers"?:
-                trimmed1 = "MB Speak."
+                trimmed1 = "IntSpk"
             default:
                 trimmed1 = String(trimmed1.prefix(4))
             }
             switch trimmed2 {
+            case let str where str!.contains("AirPods"):
+                trimmed2 = "AirPods"
             case "Display Audio"?:
-                trimmed2 = "Disp. Audio"
+                trimmed2 = "Display"
             case "Bose OE"?:
                 trimmed2 = "Bose"
             case "External Microphone"?:
                 trimmed2 = "Ext. Mic"
             case "Internal Microphone"?:
-                trimmed2 = "Int. Mic"
+                trimmed2 = "IntMic"
             case "MacBook Pro Microphone"?:
-                trimmed2 = "MB Mic"
+                trimmed2 = "IntMic"
             default:
                 trimmed2 = String(trimmed2.prefix(4))
             }
@@ -487,7 +480,7 @@ class AudioDeviceController: NSObject {
 //        checkPlayers()
 
         getDeviceVolume()
-        var iconTemp = currentOutputDevice
+        let iconTemp: String = currentOutputDevice
         volume = volumeSlider.floatValue
         if isMuted == true                      {
             volumeIndicator = "_muted"
@@ -499,25 +492,24 @@ class AudioDeviceController: NSObject {
             if (volume >= 0.75)                      { volumeIndicator = "_100" }
             if (volume == 0)                         { volumeIndicator = "_0"   }
         }
-        if ((iconTemp?.range(of: "BT") != nil) || (iconTemp?.range(of: "Bose") != nil)) {
-            iconTemp = "BT"
-        }
+
         switch iconTemp {
-        case "BT"?:
-            icon = NSImage(named: "Bluetooth" + volumeIndicator)
-        case "Internal Speakers"?:
-            icon = NSImage(named: "Speakers" + volumeIndicator)
-        case "MacBook Pro Speakers"?:
-            icon = NSImage(named: "Speakers" + volumeIndicator)
-        case "Display Audio"?:
-            icon = NSImage(named: "Display" + volumeIndicator)
-        case "Headphones"?:
-            icon = NSImage(named: "Headphones" + volumeIndicator)
+        case let str where str.contains("AirPods"):
+            iconName =  "Airpods"
+        case let str where str.contains("BT"):
+            iconName = "Bluetooth"
+        case let str where str.contains("Bose"):
+            iconName = "Bluetooth"
+        case "Internal Speakers", "MacBook Pro Speakers":
+            iconName =  "Speakers"
+        case "Display Audio":
+            iconName = "Display"
+        case "Headphones":
+            iconName = "Headphones"
         default:
-            icon = NSImage(named: "Default" + volumeIndicator)
+            iconName = "Default"
         }
-        statusItem.image = icon
-        
+        statusItem.image = NSImage(named: iconName + volumeIndicator)
     }
     
     @objc func bringPlayerToFrom() {
