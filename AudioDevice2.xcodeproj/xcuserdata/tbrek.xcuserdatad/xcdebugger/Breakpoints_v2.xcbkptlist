@@ -87,56 +87,5 @@
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "AD227CED-F659-4D4D-90A9-8236DB0E7275"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "AudioDevice2/AudioDeviceController.swift"
-            timestampString = "567784556.46416"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "63"
-            endingLineNumber = "63"
-            landmarkName = "unknown"
-            landmarkType = "0">
-            <Locations>
-               <Location
-                  uuid = "AD227CED-F659-4D4D-90A9-8236DB0E7275 - 8a7b1b3820529cb1"
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "AudioDevice2.AudioDeviceController.(autoPauseOnScreenLockCheck in _F1A7C071562FB2739AD96A40DEE149EB).getter : weak Swift.Optional&lt;__C.NSButton&gt;"
-                  moduleName = "AudioDevice2"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/tbrek/Documents/projects/Xcode/macOS/AudioDevice2/AudioDevice2/AudioDeviceController.swift"
-                  timestampString = "559217378.621726"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "61"
-                  endingLineNumber = "61"
-                  offsetFromSymbolStart = "86">
-               </Location>
-               <Location
-                  uuid = "AD227CED-F659-4D4D-90A9-8236DB0E7275 - 8a7b1b3820529cb1"
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "AudioDevice2.AudioDeviceController.(autoPauseOnScreenLockCheck in _F1A7C071562FB2739AD96A40DEE149EB).setter : weak Swift.Optional&lt;__C.NSButton&gt;"
-                  moduleName = "AudioDevice2"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/tbrek/Documents/projects/Xcode/macOS/AudioDevice2/AudioDevice2/AudioDeviceController.swift"
-                  timestampString = "559217378.6248471"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "61"
-                  endingLineNumber = "61"
-                  offsetFromSymbolStart = "106">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
    </Breakpoints>
 </Bucket>
