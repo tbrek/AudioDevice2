@@ -265,6 +265,7 @@ class AudioDeviceController: NSObject {
                         nowPlaying.isEnabled = true
                     } else {
                         mediaControlPlayPauseButton.image = NSImage(named: "Play")
+                        isiTunesPlaying = false
                     }
                 }
             }
@@ -276,9 +277,6 @@ class AudioDeviceController: NSObject {
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
             mediaControlPlayPauseButton.image = NSImage(named: "Pause")
-//            command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
-//            commandObject = NSAppleScript(source: command)
-//            spotifyStatus = commandObject!.executeAndReturnError(&error)
             isSpotifyPlaying = true
         }
         
@@ -287,9 +285,7 @@ class AudioDeviceController: NSObject {
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
             mediaControlPlayPauseButton.image = NSImage(named: "Pause")
-//            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
-//            commandObject = NSAppleScript(source: command)
-//            iTunesStatus = commandObject!.executeAndReturnError(&error)
+
             isiTunesPlaying = true
         }
     }
@@ -297,9 +293,6 @@ class AudioDeviceController: NSObject {
     
     @objc func pausePlayers() {
         if (isSpotifyRunning == true) {
-//            command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
-//            commandObject = NSAppleScript(source: command)
-//            spotifyStatus = commandObject!.executeAndReturnError(&error)
             command = "if application \"Spotify\" is running then tell application \"Spotify\" to pause"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
@@ -308,9 +301,6 @@ class AudioDeviceController: NSObject {
         }
         
         if (isiTunesRunning == true) {
-//            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
-//            commandObject = NSAppleScript(source: command)
-//            iTunesStatus = commandObject!.executeAndReturnError(&error)
             command = "if application \"iTunes\" is running then tell application \"iTunes\" to pause"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
@@ -503,7 +493,6 @@ class AudioDeviceController: NSObject {
             if (volume == 0)                         { volumeIndicator = "_0"   }
         }
 
-        
         switch iconTemp {
         case let str where str.contains("AirPods"):
             iconName =  "Airpods"
@@ -521,7 +510,6 @@ class AudioDeviceController: NSObject {
             iconName = "Default"
         }
         statusItem.image = NSImage(named: iconName + volumeIndicator)
-        
     }
     
     @objc func bringPlayerToFrom() {
