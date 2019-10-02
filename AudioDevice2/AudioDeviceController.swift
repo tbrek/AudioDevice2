@@ -10,12 +10,16 @@ import Quartz
 import AudioToolbox
 
 var audiodevicePath: String!
+var batteryScriptPath: String!
+var batteryLevels: String!
 var autoPauseOnScreenLock: Bool!
 var autoPauseOnOutputChange: Bool!
 var hideAppPrefs: Bool!
 var commandObject: NSAppleScript!
 var currentOutputDevice: String!
 var currentInputDevice: String!
+var outputDeviceName: NSAttributedString!
+var airpodsBatteryValues: NSAttributedString!
 var deviceColor: NSColor!
 var defaults = UserDefaults.standard
 var inputsArray: [String]!
@@ -57,7 +61,7 @@ let mediaControlNextButton           = NSButton(frame: NSRect(x: 143, y: 0, widt
 var mediaControlsView                = NSView(frame: NSRect(x: 0, y:0, width: 225, height:19))
 var mediaItem = NSMenuItem()
 var nowPlaying = NSMenuItem(title: "  ", action: nil)
-
+var airpodsBatteryStatus = NSMenuItem()
 
 var urlPath: URL!
 var isSpotifyRunning: Bool = false
@@ -106,8 +110,13 @@ class AudioDeviceController: NSObject {
         volumeItem.view = volumeSliderView
         volumeSlider.isContinuous = true
         super.init()
+        
         urlPath = Bundle.main.url(forResource: "audiodevice", withExtension: "")
         audiodevicePath = urlPath.path
+        
+        urlPath = Bundle.main.url(forResource: "airpods_battery.sh", withExtension: "")
+        batteryScriptPath = urlPath.path
+        
         autoPauseOnScreenLock   = defaults.object(forKey: "autoPauseOnScreenLock") as! Bool?
         autoPauseOnOutputChange = defaults.object(forKey: "autoPauseOnOutputChange") as! Bool?
         showOutputDevice        = defaults.object(forKey: "showOutputDevice") as! Bool?
@@ -410,6 +419,19 @@ class AudioDeviceController: NSObject {
         outputsArray = outputs.components(separatedBy: ["\n"])
     }
     
+    @objc func getBattery() {
+        let myAppleScript = "do shell script \""+batteryScriptPath+"\""
+        var error: NSDictionary?
+        let scriptObject = NSAppleScript(source: myAppleScript)
+        if let output: NSAppleEventDescriptor = scriptObject?.executeAndReturnError(
+                       &error) {
+            batteryLevels = output.stringValue
+            batteryLevels = batteryLevels.replacingOccurrences(of: " R", with: "% R")
+            var batteryLevelLeft = 
+                   }
+        airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
+    }
+    
     @objc func updateMenu() {
         getCurrentInput()
         getCurrentOutput()
@@ -474,6 +496,7 @@ class AudioDeviceController: NSObject {
         if (currentOutputDevice == "Internal Speakers" || currentOutputDevice == "Headphones" || currentOutputDevice == "MacBook Pro Speakers") {
 //            reloadMenu()
         }
+        getBattery()
     }
     
     @objc func updateIcon() {
@@ -534,10 +557,21 @@ class AudioDeviceController: NSObject {
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Output Device:", comment: "")))
         outputsArray.forEach { device in
             self.menu.addItem({
+                outputDeviceName = NSAttributedString(string: "")
+                if (device.contains("AirPods") == true) {
+                } else {
+                    outputDeviceName = NSAttributedString(string: device)
+                }
                 let item = NSMenuItem(title: device, target: self, action: #selector(selectOutputDeviceActions(_ :)))
                 item.state = currentOutputDevice == device ? .on : .off
                 return item
                 }())
+            if (device.contains("AirPods") == true) {
+                airpodsBatteryStatus.title = "airpodsBatteryStatus"
+                self.menu.addItem(airpodsBatteryStatus)
+                getBattery()
+                airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
+            }
         }
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Input Device:", comment: "")))
