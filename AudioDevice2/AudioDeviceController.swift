@@ -422,14 +422,38 @@ class AudioDeviceController: NSObject {
     @objc func getBattery() {
         let myAppleScript = "do shell script \""+batteryScriptPath+"\""
         var error: NSDictionary?
+        var leftBatteryAttributed: NSAttributedString
+        var rightBatteryAttributed: NSAttributedString
+        let batteryLevelsMutable = NSMutableAttributedString()
+        var colorLeft: NSColor!
+        var colorRight: NSColor!
         let scriptObject = NSAppleScript(source: myAppleScript)
         if let output: NSAppleEventDescriptor = scriptObject?.executeAndReturnError(
                        &error) {
             batteryLevels = output.stringValue
             batteryLevels = batteryLevels.replacingOccurrences(of: " R", with: "% R")
-            var batteryLevelLeft = 
-                   }
-        airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
+            let leftBattery = batteryLevels.components(separatedBy: "% ")[0].replacingOccurrences(of: "L: ", with: "")
+            let rightBattery = batteryLevels.components(separatedBy: "R: ")[1]
+            if Int(leftBattery) ?? 0 < 20 {
+                colorLeft = NSColor.red
+            } else { colorLeft = NSColor.gray }
+            leftBatteryAttributed = NSAttributedString(string: leftBattery, attributes: [NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray])
+            if Int(rightBattery) ?? 0 < 20 {
+                colorRight = NSColor.red
+            } else { colorRight = NSColor.gray }
+            rightBatteryAttributed = NSAttributedString(string: leftBattery, attributes: [NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray])
+            batteryLevelsMutable.append(NSAttributedString(string: "L: ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
+            batteryLevelsMutable.append(leftBatteryAttributed)
+            batteryLevelsMutable.append(NSAttributedString(string: "% ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
+            batteryLevelsMutable.append(NSAttributedString(string: "R: ", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
+            batteryLevelsMutable.append(rightBatteryAttributed)
+            batteryLevelsMutable.append(NSAttributedString(string: "%", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
+            
+            batteryLevelsMutable.addAttribute(NSAttributedString.Key.font, value: NSFont.systemFont(ofSize: 10), range: NSRange(location: 0, length: batteryLevelsMutable.length))
+            
+        }
+//        airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
+        airpodsBatteryStatus.attributedTitle = batteryLevelsMutable
     }
     
     @objc func updateMenu() {
@@ -570,7 +594,7 @@ class AudioDeviceController: NSObject {
                 airpodsBatteryStatus.title = "airpodsBatteryStatus"
                 self.menu.addItem(airpodsBatteryStatus)
                 getBattery()
-                airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
+//                airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
             }
         }
         self.menu.addItem(NSMenuItem.separator())
