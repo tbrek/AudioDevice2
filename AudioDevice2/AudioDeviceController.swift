@@ -24,7 +24,7 @@ var deviceColor: NSColor!
 var defaults = UserDefaults.standard
 var inputsArray: [String]!
 var outputsArray: [String]!
-
+var airPodsConnected = false
 var leftLevel = Float32(-1)
 var rightLevel = Float32(-1)
 var icon: NSImage!
@@ -42,7 +42,7 @@ var currentTrackTitle: NSAppleEventDescriptor!
 var currentTrackArtist: NSAppleEventDescriptor!
 var timer1: Timer!
 var timer2: Timer!
-var timer3: Timer!
+
 var trimmed1: String!
 var trimmed2: String!
 
@@ -102,20 +102,27 @@ class AudioDeviceController: NSObject {
             defaults.set(true, forKey: "hideAppPrefs")
         }
     
-        // Setup volumeSlider
+        // Pre-setup volumeSlider
         volumeSliderView.addSubview(volumeSlider)
         volumeSlider.minValue = 0.0
         volumeSlider.maxValue = 1
         volumeSlider.floatValue = 0.5
         volumeItem.view = volumeSliderView
         volumeSlider.isContinuous = true
+        
+        
         super.init()
         
+        // Audiodevice location
         urlPath = Bundle.main.url(forResource: "audiodevice", withExtension: "")
         audiodevicePath = urlPath.path
         
+        // Airpods battery script locatiom
         urlPath = Bundle.main.url(forResource: "airpods_battery.sh", withExtension: "")
         batteryScriptPath = urlPath.path
+        
+        timer1 = nil
+        timer2 = nil
         
         autoPauseOnScreenLock   = defaults.object(forKey: "autoPauseOnScreenLock") as! Bool?
         autoPauseOnOutputChange = defaults.object(forKey: "autoPauseOnOutputChange") as! Bool?
@@ -123,16 +130,23 @@ class AudioDeviceController: NSObject {
         showInputDevice         = defaults.object(forKey: "showInputDevice") as! Bool?
         useShortNames           = defaults.object(forKey: "useShortNames") as! Bool?
         hideAppPrefs            = defaults.object(forKey: "hideAppPrefs") as! Bool?
+        
         checkPlayers()
+        
+        // Setting up
         self.setupItems()
+//        timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
+//        timer2 = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(checkifHeadphonesSpeakers), userInfo: nil, repeats: true)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(outputChanged), name: .audioOutputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
-        timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
-        timer2 = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(checkifHeadphonesSpeakers), userInfo: nil, repeats: true)
         let center = DistributedNotificationCenter.default()
         center.addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name(rawValue: "com.apple.screenIsLocked"), object: nil)
         center.addObserver(self, selector: #selector(screenUnlocked), name: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"), object: nil)
+        
+        timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
+              
+        timer2 = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(checkifHeadphonesSpeakers), userInfo: nil, repeats: true)
         
     }
 
@@ -147,6 +161,8 @@ class AudioDeviceController: NSObject {
         timer2.invalidate()
     }
         
+
+    
     @objc func playPause() {
         checkPlayers()
         if (isSpotifyPlaying == true) {
@@ -357,6 +373,7 @@ class AudioDeviceController: NSObject {
             return item
         }()
         reloadMenu()
+        
     }
 
     @objc func getCurrentOutput() {
@@ -420,40 +437,44 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func getBattery() {
-        let myAppleScript = "do shell script \""+batteryScriptPath+"\""
-        var error: NSDictionary?
-        var leftBatteryAttributed: NSAttributedString
-        var rightBatteryAttributed: NSAttributedString
-        let batteryLevelsMutable = NSMutableAttributedString()
-        var colorLeft: NSColor!
-        var colorRight: NSColor!
-        let scriptObject = NSAppleScript(source: myAppleScript)
-        if let output: NSAppleEventDescriptor = scriptObject?.executeAndReturnError(
-                       &error) {
-            batteryLevels = output.stringValue
-            batteryLevels = batteryLevels.replacingOccurrences(of: " R", with: "% R")
-            let leftBattery = batteryLevels.components(separatedBy: "% ")[0].replacingOccurrences(of: "L: ", with: "")
-            let rightBattery = batteryLevels.components(separatedBy: "R: ")[1]
-            if Int(leftBattery) ?? 0 < 20 {
-                colorLeft = NSColor.red
-            } else { colorLeft = NSColor.gray }
-            leftBatteryAttributed = NSAttributedString(string: leftBattery, attributes: [NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray])
-            if Int(rightBattery) ?? 0 < 20 {
-                colorRight = NSColor.red
-            } else { colorRight = NSColor.gray }
-            rightBatteryAttributed = NSAttributedString(string: leftBattery, attributes: [NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray])
-            batteryLevelsMutable.append(NSAttributedString(string: "L: ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
-            batteryLevelsMutable.append(leftBatteryAttributed)
-            batteryLevelsMutable.append(NSAttributedString(string: "% ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
-            batteryLevelsMutable.append(NSAttributedString(string: "R: ", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
-            batteryLevelsMutable.append(rightBatteryAttributed)
-            batteryLevelsMutable.append(NSAttributedString(string: "%", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
-            
-            batteryLevelsMutable.addAttribute(NSAttributedString.Key.font, value: NSFont.systemFont(ofSize: 10), range: NSRange(location: 0, length: batteryLevelsMutable.length))
-            
+        if airPodsConnected == true {
+            let myAppleScript = "do shell script \""+batteryScriptPath+"\""
+            var error: NSDictionary?
+            var leftBatteryAttributed: NSAttributedString
+            var rightBatteryAttributed: NSAttributedString
+            let batteryLevelsMutable = NSMutableAttributedString()
+            var colorLeft: NSColor!
+            var colorRight: NSColor!
+            let scriptObject = NSAppleScript(source: myAppleScript)
+                if let output: NSAppleEventDescriptor = scriptObject?.executeAndReturnError(
+                        &error) {
+                    if output.stringValue != " Not Connected" {
+                        batteryLevels = output.stringValue
+                        batteryLevels = batteryLevels.replacingOccurrences(of: " R", with: "% R")
+                        let leftBattery = batteryLevels.components(separatedBy: "% ")[0].replacingOccurrences(of: "L: ", with: "")
+                        let rightBattery = batteryLevels.components(separatedBy: "R: ")[1]
+                        if Int(leftBattery) ?? 0 < 20 {
+                            colorLeft = NSColor.red
+                        } else { colorLeft = NSColor.gray }
+                        leftBatteryAttributed = NSAttributedString(string: leftBattery, attributes: [NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray])
+                        if Int(rightBattery) ?? 0 < 20 {
+                            colorRight = NSColor.red
+                        } else { colorRight = NSColor.gray }
+                        rightBatteryAttributed = NSAttributedString(string: rightBattery, attributes: [NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray])
+                        batteryLevelsMutable.append(NSAttributedString(string: "L: ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
+                        batteryLevelsMutable.append(leftBatteryAttributed)
+                        batteryLevelsMutable.append(NSAttributedString(string: "% ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
+                        batteryLevelsMutable.append(NSAttributedString(string: "R: ", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
+                        batteryLevelsMutable.append(rightBatteryAttributed)
+                        batteryLevelsMutable.append(NSAttributedString(string: "%", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
+                        batteryLevelsMutable.addAttribute(NSAttributedString.Key.font, value: NSFont.systemFont(ofSize: 10), range: NSRange(location: 0, length: batteryLevelsMutable.length))
+                        airpodsBatteryStatus.attributedTitle = batteryLevelsMutable
+                        
+                    }
+            }
         }
 //        airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
-        airpodsBatteryStatus.attributedTitle = batteryLevelsMutable
+        
     }
     
     @objc func updateMenu() {
@@ -593,6 +614,7 @@ class AudioDeviceController: NSObject {
             if (device.contains("AirPods") == true) {
                 airpodsBatteryStatus.title = "airpodsBatteryStatus"
                 self.menu.addItem(airpodsBatteryStatus)
+                airPodsConnected = true
                 getBattery()
 //                airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
             }
