@@ -29,7 +29,7 @@ var leftLevel = Float32(-1)
 var rightLevel = Float32(-1)
 var icon: NSImage!
 var iconName: String!
-
+var batteryLevelsMutable = NSMutableAttributedString()
 
 var isMuted: Bool!
 var muteVal = Float32(-1)
@@ -112,6 +112,26 @@ class AudioDeviceController: NSObject {
         
         
         super.init()
+        
+        // Setting up media view
+        mediaControlPreviousButton.image = NSImage(named: "Previous")
+        mediaControlPreviousButton.target = self
+        mediaControlPreviousButton.action = #selector(previous)
+        mediaControlPreviousButton.isBordered = false
+        mediaControlsView.addSubview(mediaControlPreviousButton)
+        mediaControlPlayPauseButton.image = NSImage(named: "Play")
+        mediaControlPlayPauseButton.target = self
+        mediaControlPlayPauseButton.action = #selector(playPause)
+        mediaControlPlayPauseButton.isBordered = false
+        mediaControlsView.addSubview(mediaControlPlayPauseButton)
+        mediaControlNextButton.image = NSImage(named: "Next")
+        mediaControlNextButton.target = self
+        mediaControlNextButton.action = #selector(next)
+        mediaControlNextButton.isBordered = false
+        mediaControlsView.addSubview(mediaControlNextButton)
+        mediaItem.view = mediaControlsView
+        
+        
         
         // Audiodevice location
         urlPath = Bundle.main.url(forResource: "audiodevice", withExtension: "")
@@ -437,15 +457,16 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func getBattery() {
+        batteryLevelsMutable = NSMutableAttributedString(string: "")
         if airPodsConnected == true {
             let myAppleScript = "do shell script \""+batteryScriptPath+"\""
             var error: NSDictionary?
             var leftBatteryAttributed: NSAttributedString
             var rightBatteryAttributed: NSAttributedString
-            let batteryLevelsMutable = NSMutableAttributedString()
             var colorLeft: NSColor!
             var colorRight: NSColor!
             let scriptObject = NSAppleScript(source: myAppleScript)
+            
                 if let output: NSAppleEventDescriptor = scriptObject?.executeAndReturnError(
                         &error) {
                     if output.stringValue != " Not Connected" {
@@ -643,22 +664,7 @@ class AudioDeviceController: NSObject {
         // Create media controls\
 
 //        mediaControlsView.setFrameSize(NSSize(width: 200, height: 19))
-        mediaControlPreviousButton.image = NSImage(named: "Previous")
-        mediaControlPreviousButton.target = self
-        mediaControlPreviousButton.action = #selector(previous)
-        mediaControlPreviousButton.isBordered = false
-        mediaControlsView.addSubview(mediaControlPreviousButton)
-        mediaControlPlayPauseButton.image = NSImage(named: "Play")
-        mediaControlPlayPauseButton.target = self
-        mediaControlPlayPauseButton.action = #selector(playPause)
-        mediaControlPlayPauseButton.isBordered = false
-        mediaControlsView.addSubview(mediaControlPlayPauseButton)
-        mediaControlNextButton.image = NSImage(named: "Next")
-        mediaControlNextButton.target = self
-        mediaControlNextButton.action = #selector(next)
-        mediaControlNextButton.isBordered = false
-        mediaControlsView.addSubview(mediaControlNextButton)
-        mediaItem.view = mediaControlsView
+       
         self.menu.addItem(mediaItem)
         
         self.menu.addItem(NSMenuItem.separator())
