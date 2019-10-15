@@ -10,22 +10,26 @@ import Quartz
 import AudioToolbox
 
 var audiodevicePath: String!
+var batteryScriptPath: String!
+var batteryLevels: String!
 var autoPauseOnScreenLock: Bool!
 var autoPauseOnOutputChange: Bool!
 var hideAppPrefs: Bool!
 var commandObject: NSAppleScript!
 var currentOutputDevice: String!
 var currentInputDevice: String!
+var outputDeviceName: NSAttributedString!
+var airpodsBatteryValues: NSAttributedString!
 var deviceColor: NSColor!
 var defaults = UserDefaults.standard
 var inputsArray: [String]!
 var outputsArray: [String]!
-
+var airPodsConnected = false
 var leftLevel = Float32(-1)
 var rightLevel = Float32(-1)
 var icon: NSImage!
 var iconName: String!
-
+var batteryLevelsMutable = NSMutableAttributedString()
 
 var isMuted: Bool!
 var muteVal = Float32(-1)
@@ -38,7 +42,7 @@ var currentTrackTitle: NSAppleEventDescriptor!
 var currentTrackArtist: NSAppleEventDescriptor!
 var timer1: Timer!
 var timer2: Timer!
-var timer3: Timer!
+
 var trimmed1: String!
 var trimmed2: String!
 
@@ -57,7 +61,7 @@ let mediaControlNextButton           = NSButton(frame: NSRect(x: 143, y: 0, widt
 var mediaControlsView                = NSView(frame: NSRect(x: 0, y:0, width: 225, height:19))
 var mediaItem = NSMenuItem()
 var nowPlaying = NSMenuItem(title: "  ", action: nil)
-
+var airpodsBatteryStatus = NSMenuItem()
 
 var urlPath: URL!
 var isSpotifyRunning: Bool = false
@@ -98,32 +102,71 @@ class AudioDeviceController: NSObject {
             defaults.set(true, forKey: "hideAppPrefs")
         }
     
-        // Setup volumeSlider
+        // Pre-setup volumeSlider
         volumeSliderView.addSubview(volumeSlider)
         volumeSlider.minValue = 0.0
         volumeSlider.maxValue = 1
         volumeSlider.floatValue = 0.5
         volumeItem.view = volumeSliderView
         volumeSlider.isContinuous = true
+        
+        
         super.init()
+        
+        // Setting up media view
+        mediaControlPreviousButton.image = NSImage(named: "Previous")
+        mediaControlPreviousButton.target = self
+        mediaControlPreviousButton.action = #selector(previous)
+        mediaControlPreviousButton.isBordered = false
+        mediaControlsView.addSubview(mediaControlPreviousButton)
+        mediaControlPlayPauseButton.image = NSImage(named: "Play")
+        mediaControlPlayPauseButton.target = self
+        mediaControlPlayPauseButton.action = #selector(playPause)
+        mediaControlPlayPauseButton.isBordered = false
+        mediaControlsView.addSubview(mediaControlPlayPauseButton)
+        mediaControlNextButton.image = NSImage(named: "Next")
+        mediaControlNextButton.target = self
+        mediaControlNextButton.action = #selector(next)
+        mediaControlNextButton.isBordered = false
+        mediaControlsView.addSubview(mediaControlNextButton)
+        mediaItem.view = mediaControlsView
+        
+        
+        
+        // Audiodevice location
         urlPath = Bundle.main.url(forResource: "audiodevice", withExtension: "")
         audiodevicePath = urlPath.path
+        
+        // Airpods battery script locatiom
+        urlPath = Bundle.main.url(forResource: "airpods_battery.sh", withExtension: "")
+        batteryScriptPath = urlPath.path
+        
+        timer1 = nil
+        timer2 = nil
+        
         autoPauseOnScreenLock   = defaults.object(forKey: "autoPauseOnScreenLock") as! Bool?
         autoPauseOnOutputChange = defaults.object(forKey: "autoPauseOnOutputChange") as! Bool?
         showOutputDevice        = defaults.object(forKey: "showOutputDevice") as! Bool?
         showInputDevice         = defaults.object(forKey: "showInputDevice") as! Bool?
         useShortNames           = defaults.object(forKey: "useShortNames") as! Bool?
         hideAppPrefs            = defaults.object(forKey: "hideAppPrefs") as! Bool?
+        
         checkPlayers()
+        
+        // Setting up
         self.setupItems()
+//        timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
+//        timer2 = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(checkifHeadphonesSpeakers), userInfo: nil, repeats: true)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(outputChanged), name: .audioOutputDeviceDidChange)
         NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
-        timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
-        timer2 = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(checkifHeadphonesSpeakers), userInfo: nil, repeats: true)
         let center = DistributedNotificationCenter.default()
         center.addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name(rawValue: "com.apple.screenIsLocked"), object: nil)
         center.addObserver(self, selector: #selector(screenUnlocked), name: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"), object: nil)
+        
+        timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
+              
+        timer2 = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(checkifHeadphonesSpeakers), userInfo: nil, repeats: true)
         
     }
 
@@ -138,6 +181,8 @@ class AudioDeviceController: NSObject {
         timer2.invalidate()
     }
         
+
+    
     @objc func playPause() {
         checkPlayers()
         if (isSpotifyPlaying == true) {
@@ -348,6 +393,7 @@ class AudioDeviceController: NSObject {
             return item
         }()
         reloadMenu()
+        
     }
 
     @objc func getCurrentOutput() {
@@ -408,6 +454,48 @@ class AudioDeviceController: NSObject {
         var outputs: String = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
         outputs = String(outputs.dropLast())
         outputsArray = outputs.components(separatedBy: ["\n"])
+    }
+    
+    @objc func getBattery() {
+        batteryLevelsMutable = NSMutableAttributedString(string: "")
+        if airPodsConnected == true {
+            let myAppleScript = "do shell script \""+batteryScriptPath+"\""
+            var error: NSDictionary?
+            var leftBatteryAttributed: NSAttributedString
+            var rightBatteryAttributed: NSAttributedString
+            var colorLeft: NSColor!
+            var colorRight: NSColor!
+            let scriptObject = NSAppleScript(source: myAppleScript)
+            
+                if let output: NSAppleEventDescriptor = scriptObject?.executeAndReturnError(
+                        &error) {
+                    if output.stringValue != " Not Connected" {
+                        batteryLevels = output.stringValue
+                        batteryLevels = batteryLevels.replacingOccurrences(of: " R", with: "% R")
+                        let leftBattery = batteryLevels.components(separatedBy: "% ")[0].replacingOccurrences(of: "L: ", with: "")
+                        let rightBattery = batteryLevels.components(separatedBy: "R: ")[1]
+                        if Int(leftBattery) ?? 0 < 20 {
+                            colorLeft = NSColor.red
+                        } else { colorLeft = NSColor.gray }
+                        leftBatteryAttributed = NSAttributedString(string: leftBattery, attributes: [NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray])
+                        if Int(rightBattery) ?? 0 < 20 {
+                            colorRight = NSColor.red
+                        } else { colorRight = NSColor.gray }
+                        rightBatteryAttributed = NSAttributedString(string: rightBattery, attributes: [NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray])
+                        batteryLevelsMutable.append(NSAttributedString(string: "L: ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
+                        batteryLevelsMutable.append(leftBatteryAttributed)
+                        batteryLevelsMutable.append(NSAttributedString(string: "% ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
+                        batteryLevelsMutable.append(NSAttributedString(string: "R: ", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
+                        batteryLevelsMutable.append(rightBatteryAttributed)
+                        batteryLevelsMutable.append(NSAttributedString(string: "%", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
+                        batteryLevelsMutable.addAttribute(NSAttributedString.Key.font, value: NSFont.systemFont(ofSize: 10), range: NSRange(location: 0, length: batteryLevelsMutable.length))
+                        airpodsBatteryStatus.attributedTitle = batteryLevelsMutable
+                        
+                    }
+            }
+        }
+//        airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
+        
     }
     
     @objc func updateMenu() {
@@ -474,6 +562,7 @@ class AudioDeviceController: NSObject {
         if (currentOutputDevice == "Internal Speakers" || currentOutputDevice == "Headphones" || currentOutputDevice == "MacBook Pro Speakers") {
 //            reloadMenu()
         }
+        getBattery()
     }
     
     @objc func updateIcon() {
@@ -534,10 +623,22 @@ class AudioDeviceController: NSObject {
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Output Device:", comment: "")))
         outputsArray.forEach { device in
             self.menu.addItem({
+                outputDeviceName = NSAttributedString(string: "")
+                if (device.contains("AirPods") == true) {
+                } else {
+                    outputDeviceName = NSAttributedString(string: device)
+                }
                 let item = NSMenuItem(title: device, target: self, action: #selector(selectOutputDeviceActions(_ :)))
                 item.state = currentOutputDevice == device ? .on : .off
                 return item
                 }())
+            if (device.contains("AirPods") == true) {
+                airpodsBatteryStatus.title = "airpodsBatteryStatus"
+                self.menu.addItem(airpodsBatteryStatus)
+                airPodsConnected = true
+                getBattery()
+//                airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
+            }
         }
         self.menu.addItem(NSMenuItem.separator())
         self.menu.addItem(NSMenuItem(title: NSLocalizedString("Input Device:", comment: "")))
@@ -563,22 +664,7 @@ class AudioDeviceController: NSObject {
         // Create media controls\
 
 //        mediaControlsView.setFrameSize(NSSize(width: 200, height: 19))
-        mediaControlPreviousButton.image = NSImage(named: "Previous")
-        mediaControlPreviousButton.target = self
-        mediaControlPreviousButton.action = #selector(previous)
-        mediaControlPreviousButton.isBordered = false
-        mediaControlsView.addSubview(mediaControlPreviousButton)
-        mediaControlPlayPauseButton.image = NSImage(named: "Play")
-        mediaControlPlayPauseButton.target = self
-        mediaControlPlayPauseButton.action = #selector(playPause)
-        mediaControlPlayPauseButton.isBordered = false
-        mediaControlsView.addSubview(mediaControlPlayPauseButton)
-        mediaControlNextButton.image = NSImage(named: "Next")
-        mediaControlNextButton.target = self
-        mediaControlNextButton.action = #selector(next)
-        mediaControlNextButton.isBordered = false
-        mediaControlsView.addSubview(mediaControlNextButton)
-        mediaItem.view = mediaControlsView
+       
         self.menu.addItem(mediaItem)
         
         self.menu.addItem(NSMenuItem.separator())
