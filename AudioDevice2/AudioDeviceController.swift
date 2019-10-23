@@ -30,7 +30,7 @@ var rightLevel = Float32(-1)
 var icon: NSImage!
 var iconName: String!
 var batteryLevelsMutable = NSMutableAttributedString()
-
+var isMenuOpen: Bool!
 var isMuted: Bool!
 var muteVal = Float32(-1)
 var showInputDevice: Bool!
@@ -85,7 +85,7 @@ class AudioDeviceController: NSObject {
     private weak var labelVersion: NSTextField!
     
     override init() {
-        
+        isMenuOpen = false
         let launchedBefore = defaults.bool(forKey: "launchedBefore")
         if launchedBefore  {
 //            hideAppPrefsCheck?.state = hideAppPrefs == true ? .on : .off
@@ -113,6 +113,8 @@ class AudioDeviceController: NSObject {
         
         super.init()
         
+        volumeSlider.target = self
+        volumeSlider.action = #selector(setDeviceVolume(slider:))
         // Setting up media view
         mediaControlPreviousButton.image = NSImage(named: "Previous")
         mediaControlPreviousButton.target = self
@@ -481,6 +483,7 @@ class AudioDeviceController: NSObject {
                         if Int(rightBattery) ?? 0 < 20 {
                             colorRight = NSColor.red
                         } else { colorRight = NSColor.gray }
+                        
                         rightBatteryAttributed = NSAttributedString(string: rightBattery, attributes: [NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray])
                         batteryLevelsMutable.append(NSAttributedString(string: "L: ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
                         batteryLevelsMutable.append(leftBatteryAttributed)
@@ -489,8 +492,8 @@ class AudioDeviceController: NSObject {
                         batteryLevelsMutable.append(rightBatteryAttributed)
                         batteryLevelsMutable.append(NSAttributedString(string: "%", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
                         batteryLevelsMutable.addAttribute(NSAttributedString.Key.font, value: NSFont.systemFont(ofSize: 10), range: NSRange(location: 0, length: batteryLevelsMutable.length))
+//                        NSLog(batteryLevelsMutable.string)
                         airpodsBatteryStatus.attributedTitle = batteryLevelsMutable
-                        
                     }
             }
         }
@@ -611,78 +614,78 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func reloadMenu() {
-        getCurrentInput()
-        getCurrentOutput()
-        getInputs()
-        getOutputs()
-        self.menu.removeAllItems()
-        self.menu.addItem(NSMenuItem(title: "Volume:", target:self))
-        volumeSlider.target = self
-        volumeSlider.action = #selector(setDeviceVolume(slider:))
-        self.menu.addItem(volumeItem)
-        self.menu.addItem(NSMenuItem(title: NSLocalizedString("Output Device:", comment: "")))
-        outputsArray.forEach { device in
-            self.menu.addItem({
-                outputDeviceName = NSAttributedString(string: "")
+        if isMenuOpen == false {
+            getCurrentInput()
+            getCurrentOutput()
+            getInputs()
+            getOutputs()
+            self.menu.removeAllItems()
+            self.menu.addItem(NSMenuItem(title: "Volume:", target:self))
+            self.menu.addItem(volumeItem)
+            self.menu.addItem(NSMenuItem(title: NSLocalizedString("Output Device:", comment: "")))
+            outputsArray.forEach { device in
+                self.menu.addItem({
+                    outputDeviceName = NSAttributedString(string: "")
+                    if (device.contains("AirPods") == true) {
+                    } else {
+                        outputDeviceName = NSAttributedString(string: device)
+                    }
+                    let item = NSMenuItem(title: device, target: self, action: #selector(selectOutputDeviceActions(_ :)))
+                    item.state = currentOutputDevice == device ? .on : .off
+                    return item
+                    }())
                 if (device.contains("AirPods") == true) {
-                } else {
-                    outputDeviceName = NSAttributedString(string: device)
+                    airpodsBatteryStatus.title = "airpodsBatteryStatus"
+                    self.menu.addItem(airpodsBatteryStatus)
+                    airPodsConnected = true
+                    getBattery()
+
                 }
-                let item = NSMenuItem(title: device, target: self, action: #selector(selectOutputDeviceActions(_ :)))
-                item.state = currentOutputDevice == device ? .on : .off
-                return item
-                }())
-            if (device.contains("AirPods") == true) {
-                airpodsBatteryStatus.title = "airpodsBatteryStatus"
-                self.menu.addItem(airpodsBatteryStatus)
-                airPodsConnected = true
-                getBattery()
-//                airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
             }
-        }
-        self.menu.addItem(NSMenuItem.separator())
-        self.menu.addItem(NSMenuItem(title: NSLocalizedString("Input Device:", comment: "")))
-        inputsArray.forEach { device in
-            self.menu.addItem({
-                let item = NSMenuItem(title: device, target: self, action: #selector(selectInputDeviceAction(_:)))
-                item.state = currentInputDevice == device ? .on : .off
-                return item
-                }())
-        }
-        self.menu.addItem(NSMenuItem.separator())
+            self.menu.addItem(NSMenuItem.separator())
+            self.menu.addItem(NSMenuItem(title: NSLocalizedString("Input Device:", comment: "")))
+            inputsArray.forEach { device in
+                self.menu.addItem({
+                    let item = NSMenuItem(title: device, target: self, action: #selector(selectInputDeviceAction(_:)))
+                    item.state = currentInputDevice == device ? .on : .off
+                    return item
+                    }())
+            }
+            self.menu.addItem(NSMenuItem.separator())
         
 
-        let nowPlayingHeader = NSMenuItem(title: "", action:nil)
-        nowPlayingHeader.attributedTitle = NSAttributedString(string: "Now playing:", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
-        self.menu.addItem(nowPlayingHeader)
-        
-        self.menu.addItem(nowPlaying)
-        nowPlaying.action = #selector(bringPlayerToFrom)
-        nowPlaying.target = self
-        
-        nowPlaying.attributedTitle = NSAttributedString(string: "", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
+            let nowPlayingHeader = NSMenuItem(title: "", action:nil)
+            nowPlayingHeader.attributedTitle = NSAttributedString(string: "Now playing:", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
+            self.menu.addItem(nowPlayingHeader)
+            
+            self.menu.addItem(nowPlaying)
+            nowPlaying.action = #selector(bringPlayerToFrom)
+            nowPlaying.target = self
+            
+            nowPlaying.attributedTitle = NSAttributedString(string: "", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
         // Create media controls\
 
 //        mediaControlsView.setFrameSize(NSSize(width: 200, height: 19))
        
-        self.menu.addItem(mediaItem)
-        
-        self.menu.addItem(NSMenuItem.separator())
-        
-        self.menu.addItem(NSMenuItem(title: "Sound Preferences...", target: self, action: #selector(openSoundPreferences(_:))))
-        self.menu.addItem(NSMenuItem(title: "Preferences...", target: self, action: #selector(openPreferences(_:))))
-        self.menu.addItem(NSMenuItem.separator())
-        self.menu.addItem(NSMenuItem.separator())
-        self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
-        menu.item(withTitle: "Quit")?.isHidden = true
-        menu.item(withTitle: "Preferences...")?.isHidden = true
+            self.menu.addItem(mediaItem)
+            
+            self.menu.addItem(NSMenuItem.separator())
+            
+            self.menu.addItem(NSMenuItem(title: "Sound Preferences...", target: self, action: #selector(openSoundPreferences(_:))))
+            self.menu.addItem(NSMenuItem(title: "Preferences...", target: self, action: #selector(openPreferences(_:))))
+            self.menu.addItem(NSMenuItem.separator())
+            self.menu.addItem(NSMenuItem.separator())
+            self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
+            menu.item(withTitle: "Quit")?.isHidden = true
+            menu.item(withTitle: "Preferences...")?.isHidden = true
 
         // Reisze volumeSliderView & volumeSlider if needed
 //        volumeSliderView.setFrameSize(NSSize(width: 200, height: 19))
 //        NSLog("Menu %f", menu.size.width)
 //        volumeSlider.setFrameSize(NSSize(width: 160, height: 19))
         
-        updateMenu()
+            updateMenu()
+        }
     }
     
     @objc func selectOutputDeviceActions(_ sender: NSMenuItem) {
@@ -863,6 +866,7 @@ class AudioDeviceController: NSObject {
 extension AudioDeviceController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
         
+        isMenuOpen = true
         if (hideAppPrefs == true ) {
             menu.item(withTitle: "Quit")?.isHidden = true
             menu.item(withTitle: "Preferences...")?.isHidden = true
@@ -889,5 +893,10 @@ extension AudioDeviceController: NSMenuDelegate {
         }
         checkPlayers()
         getDeviceVolume()
+    }
+    
+    func menuDidClose(_ menu: NSMenu) {
+        isMenuOpen = false
+        reloadMenu()
     }
 }
