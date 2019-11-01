@@ -40,6 +40,7 @@ var spotifyStatus: NSAppleEventDescriptor!
 var iTunesStatus: NSAppleEventDescriptor!
 var currentTrackTitle: NSAppleEventDescriptor!
 var currentTrackArtist: NSAppleEventDescriptor!
+var currentArtworkImage: NSAppleEventDescriptor!
 var timer1: Timer!
 var timer2: Timer!
 
@@ -58,9 +59,13 @@ var middle = 112
 let mediaControlPreviousButton       = NSButton(frame: NSRect(x: 62, y: 0, width: 19, height: 19))
 let mediaControlPlayPauseButton      = NSButton(frame: NSRect(x: middle-10, y: 0, width: 19, height: 19))
 let mediaControlNextButton           = NSButton(frame: NSRect(x: 143, y: 0, width: 19, height: 19))
-var mediaControlsView                = NSView(frame: NSRect(x: 0, y:0, width: 225, height:19))
+var mediaControlsView                = NSView(frame: NSRect(x: 0, y: 0, width: 225, height: 19))
+var artCover                         = NSView(frame: NSRect(x: 0, y: 0, width: 225, height: 175))
 var mediaItem = NSMenuItem()
 var nowPlaying = NSMenuItem(title: "  ", action: nil)
+var artCoverItem = NSMenuItem()
+var artCoverView                     = NSImageView(frame: NSRect(x: 35, y: 10, width: 155, height: 155))
+
 var airpodsBatteryStatus = NSMenuItem()
 
 var urlPath: URL!
@@ -133,6 +138,15 @@ class AudioDeviceController: NSObject {
         mediaControlsView.addSubview(mediaControlNextButton)
         mediaItem.view = mediaControlsView
         
+//        let tempImage = NSImage(named: "Play")
+        let imagePath = URL(string: "https://i.scdn.co/image/ab67616d0000b27369f4b7cda08f4ed73cc20474")!
+        if let data = NSData(contentsOf: imagePath)  {
+            let tempImage = NSImage(data: data as Data)
+            artCoverView.image = tempImage
+        }
+        
+        artCover.addSubview(artCoverView)
+        artCoverItem.view = artCover
         
         
         // Audiodevice location
@@ -203,6 +217,19 @@ class AudioDeviceController: NSObject {
         command = "tell application \"Spotify\" to set spotifyState to artist of the current track"
         commandObject = NSAppleScript(source: command)
         currentTrackArtist = commandObject!.executeAndReturnError(&error)
+        command = "tell application \"Spotify\" to set image_data to artwork url of current track"
+        commandObject = NSAppleScript(source: command)
+        currentArtworkImage = commandObject!.executeAndReturnError(&error)
+        let notHTTPS = currentArtworkImage.stringValue ?? ""
+        let artworkURL = notHTTPS.replacingOccurrences(of: "http:", with: "https:")
+        let imagePath = URL(string: artworkURL)!
+        if let data = NSData(contentsOf: imagePath)  {
+            let tempImage = NSImage(data: data as Data)
+            artCoverView.image = tempImage
+        }
+        
+        
+        
         let nowPlayingTitleShort = (currentTrackTitle!.stringValue ?? "").prefix(25)
         let nowPlayingArtistShort = (currentTrackArtist!.stringValue ?? "").prefix(25)
 
@@ -657,17 +684,17 @@ class AudioDeviceController: NSObject {
             let nowPlayingHeader = NSMenuItem(title: "", action:nil)
             nowPlayingHeader.attributedTitle = NSAttributedString(string: "Now playing:", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
             self.menu.addItem(nowPlayingHeader)
-            
+            self.menu.addItem(artCoverItem)
             self.menu.addItem(nowPlaying)
             nowPlaying.action = #selector(bringPlayerToFrom)
             nowPlaying.target = self
-            
+            self.menu.addItem(mediaItem)
             nowPlaying.attributedTitle = NSAttributedString(string: "", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
         // Create media controls\
 
 //        mediaControlsView.setFrameSize(NSSize(width: 200, height: 19))
-       
-            self.menu.addItem(mediaItem)
+      
+            
             
             self.menu.addItem(NSMenuItem.separator())
             
