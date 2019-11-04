@@ -147,6 +147,7 @@ class AudioDeviceController: NSObject {
         
         artCover.addSubview(artCoverView)
         artCoverItem.view = artCover
+        artCoverView.imageScaling = .scaleProportionallyUpOrDown
         
         
         // Audiodevice location
@@ -520,7 +521,7 @@ class AudioDeviceController: NSObject {
                         batteryLevelsMutable.append(NSAttributedString(string: "%", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
                         batteryLevelsMutable.addAttribute(NSAttributedString.Key.font, value: NSFont.systemFont(ofSize: 10), range: NSRange(location: 0, length: batteryLevelsMutable.length))
 //                        NSLog(batteryLevelsMutable.string)
-                        airpodsBatteryStatus.attributedTitle = batteryLevelsMutable
+                        airpodsBatteryStatus.attributedTitle = batteryLevelsMutable ?? NSMutableAttributedString(string: "")
                     }
             }
         }
