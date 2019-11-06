@@ -56,15 +56,15 @@ let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 225, height: 19))
 let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 185, height: 19))
 let volumeItem = NSMenuItem()
 var middle = 112
-let mediaControlPreviousButton       = NSButton(frame: NSRect(x: 62, y: 0, width: 19, height: 19))
-let mediaControlPlayPauseButton      = NSButton(frame: NSRect(x: middle-10, y: 0, width: 19, height: 19))
-let mediaControlNextButton           = NSButton(frame: NSRect(x: 143, y: 0, width: 19, height: 19))
+let mediaControlPreviousButton       = NSButton(frame: NSRect(x: 67, y: 0, width: 19, height: 19))
+let mediaControlPlayPauseButton      = NSButton(frame: NSRect(x: 107, y: 0, width: 19, height: 19))
+let mediaControlNextButton           = NSButton(frame: NSRect(x: 148, y: 0, width: 19, height: 19))
 var mediaControlsView                = NSView(frame: NSRect(x: 0, y: 0, width: 225, height: 19))
-var artCover                         = NSView(frame: NSRect(x: 0, y: 0, width: 225, height: 175))
+var artCover                         = NSView(frame: NSRect(x: 0, y: 0, width: 225, height: 190))
 var mediaItem = NSMenuItem()
 var nowPlaying = NSMenuItem(title: "  ", action: nil)
 var artCoverItem = NSMenuItem()
-var artCoverView                     = NSImageView(frame: NSRect(x: 35, y: 10, width: 155, height: 155))
+var artCoverView                     = NSImageView(frame: NSRect(x: 25, y: 5, width: 175, height: 175))
 
 var airpodsBatteryStatus = NSMenuItem()
 
@@ -138,12 +138,9 @@ class AudioDeviceController: NSObject {
         mediaControlsView.addSubview(mediaControlNextButton)
         mediaItem.view = mediaControlsView
         
-//        let tempImage = NSImage(named: "Play")
-        let imagePath = URL(string: "https://i.scdn.co/image/ab67616d0000b27369f4b7cda08f4ed73cc20474")!
-        if let data = NSData(contentsOf: imagePath)  {
-            let tempImage = NSImage(data: data as Data)
-            artCoverView.image = tempImage
-        }
+
+        
+        artCoverView.image = NSImage(named: "Art")
         
         artCover.addSubview(artCoverView)
         artCoverItem.view = artCover
@@ -229,22 +226,32 @@ class AudioDeviceController: NSObject {
             artCoverView.image = tempImage
         }
         
-        
-        
         let nowPlayingTitleShort = (currentTrackTitle!.stringValue ?? "").prefix(25)
         let nowPlayingArtistShort = (currentTrackArtist!.stringValue ?? "").prefix(25)
 
-        let nowPlayingTitle = NSAttributedString(string: String(nowPlayingTitleShort), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
-        let nowPlayingArtist = NSAttributedString(string: String(nowPlayingArtistShort), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 11)])
-        let combination = NSMutableAttributedString()
         
+            
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        paragraphStyle.lineSpacing = 0.5
+        let nowPlayingTitle = NSAttributedString(string: String(nowPlayingTitleShort),
+                                                 attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12),
+                                                               NSAttributedString.Key.paragraphStyle: paragraphStyle])
+        let nowPlayingArtist = NSAttributedString(string: String(nowPlayingArtistShort),
+                                                  attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 11),
+                                                                NSAttributedString.Key.paragraphStyle: paragraphStyle,
+                                                                NSAttributedString.Key.foregroundColor: NSColor.gray])
+        let combination = NSMutableAttributedString(string: "", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
+//        combination.append(NSMutableAttributedString(string: "   "))
         combination.append(nowPlayingTitle)
         if (nowPlayingTitleShort.count == 25) {
-            combination.append(NSAttributedString(string: "...", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)]))
+            combination.append(NSAttributedString(string: "...", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12), NSAttributedString.Key.paragraphStyle: paragraphStyle]))
         }
-        combination.append(NSAttributedString(string: "\n"))
+
+        combination.append(NSAttributedString(string: "\n", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 1), NSAttributedString.Key.paragraphStyle: paragraphStyle]))
+//        combination.append(NSMutableAttributedString(string: "   "))
         combination.append(nowPlayingArtist)
-        combination.append(NSAttributedString(string: "\n", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 6)]))
+//        combination.append(NSAttributedString(string: "\n", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 6)]))
         nowPlaying.attributedTitle = combination
         nowPlaying.isEnabled = true
 
@@ -500,28 +507,33 @@ class AudioDeviceController: NSObject {
                 if let output: NSAppleEventDescriptor = scriptObject?.executeAndReturnError(
                         &error) {
                     if output.stringValue != " Not Connected" {
-                        batteryLevels = output.stringValue
-                        batteryLevels = batteryLevels.replacingOccurrences(of: " R", with: "% R")
-                        let leftBattery = batteryLevels.components(separatedBy: "% ")[0].replacingOccurrences(of: "L: ", with: "")
-                        let rightBattery = batteryLevels.components(separatedBy: "R: ")[1]
-                        if Int(leftBattery) ?? 0 < 20 {
-                            colorLeft = NSColor.red
-                        } else { colorLeft = NSColor.gray }
-                        leftBatteryAttributed = NSAttributedString(string: leftBattery, attributes: [NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray])
-                        if Int(rightBattery) ?? 0 < 20 {
-                            colorRight = NSColor.red
-                        } else { colorRight = NSColor.gray }
+                        if output.stringValue != nil {
+                            batteryLevels = output.stringValue
                         
-                        rightBatteryAttributed = NSAttributedString(string: rightBattery, attributes: [NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray])
-                        batteryLevelsMutable.append(NSAttributedString(string: "L: ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
-                        batteryLevelsMutable.append(leftBatteryAttributed)
-                        batteryLevelsMutable.append(NSAttributedString(string: "% ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
-                        batteryLevelsMutable.append(NSAttributedString(string: "R: ", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
-                        batteryLevelsMutable.append(rightBatteryAttributed)
-                        batteryLevelsMutable.append(NSAttributedString(string: "%", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
-                        batteryLevelsMutable.addAttribute(NSAttributedString.Key.font, value: NSFont.systemFont(ofSize: 10), range: NSRange(location: 0, length: batteryLevelsMutable.length))
-//                        NSLog(batteryLevelsMutable.string)
-                        airpodsBatteryStatus.attributedTitle = batteryLevelsMutable ?? NSMutableAttributedString(string: "")
+                            batteryLevels = batteryLevels.replacingOccurrences(of: " R", with: "% R")
+                            var leftBattery = ""
+                            var rightBattery = ""
+                            leftBattery = batteryLevels.components(separatedBy: "% ")[0].replacingOccurrences(of: "L: ", with: "")
+                            rightBattery = batteryLevels.components(separatedBy: "R: ")[1]
+                            if Int(leftBattery) ?? 0 < 20 {
+                                colorLeft = NSColor.red
+                            } else { colorLeft = NSColor.gray }
+                            leftBatteryAttributed = NSAttributedString(string: leftBattery, attributes: [NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray])
+                            if Int(rightBattery) ?? 0 < 20 {
+                                colorRight = NSColor.red
+                            } else { colorRight = NSColor.gray }
+                            
+                            rightBatteryAttributed = NSAttributedString(string: rightBattery, attributes: [NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray])
+                            batteryLevelsMutable.append(NSAttributedString(string: "L: ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
+                            batteryLevelsMutable.append(leftBatteryAttributed)
+                            batteryLevelsMutable.append(NSAttributedString(string: "% ", attributes: [ NSAttributedString.Key.foregroundColor: colorLeft ?? NSColor.gray]))
+                            batteryLevelsMutable.append(NSAttributedString(string: "R: ", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
+                            batteryLevelsMutable.append(rightBatteryAttributed)
+                            batteryLevelsMutable.append(NSAttributedString(string: "%", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
+                            batteryLevelsMutable.addAttribute(NSAttributedString.Key.font, value: NSFont.systemFont(ofSize: 10), range: NSRange(location: 0, length: batteryLevelsMutable.length))
+    //                        NSLog(batteryLevelsMutable.string)
+                            airpodsBatteryStatus.attributedTitle = batteryLevelsMutable
+                        }
                     }
             }
         }
@@ -685,11 +697,14 @@ class AudioDeviceController: NSObject {
             let nowPlayingHeader = NSMenuItem(title: "", action:nil)
             nowPlayingHeader.attributedTitle = NSAttributedString(string: "Now playing:", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
             self.menu.addItem(nowPlayingHeader)
+            
             self.menu.addItem(artCoverItem)
             self.menu.addItem(nowPlaying)
             nowPlaying.action = #selector(bringPlayerToFrom)
             nowPlaying.target = self
+            
             self.menu.addItem(mediaItem)
+            
             nowPlaying.attributedTitle = NSAttributedString(string: "", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
         // Create media controls\
 
@@ -902,18 +917,26 @@ extension AudioDeviceController: NSMenuDelegate {
             menu.item(withTitle: "Quit")?.isHidden = false
             menu.item(withTitle: "Preferences...")?.isHidden = false
         }
-        
+
         if NSEvent.modifierFlags.contains(NSEvent.ModifierFlags.option) {
             menu.item(withTitle: "Quit")?.isHidden = false
             menu.item(withTitle: "Preferences...")?.isHidden = false
         }
-        
-        
+      
+
         if (isSpotifyRunning == false && isiTunesRunning == false) {
-            nowPlaying.attributedTitle = NSAttributedString(string: "No active media player")
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .center
+            paragraphStyle.lineSpacing = 0.5
+            let noPlayingTitle = NSAttributedString(string: "No active media player",
+                                                     attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12),
+                                                                   NSAttributedString.Key.paragraphStyle: paragraphStyle])
+            nowPlaying.attributedTitle = noPlayingTitle
             mediaControlPlayPauseButton.isEnabled = false
             mediaControlNextButton.isEnabled = false
             mediaControlPreviousButton.isEnabled = false
+            artCoverView.image = NSImage(named: "Art")
+
         } else {
             mediaControlPlayPauseButton.isEnabled = true
             mediaControlNextButton.isEnabled = true
@@ -925,6 +948,6 @@ extension AudioDeviceController: NSMenuDelegate {
     
     func menuDidClose(_ menu: NSMenu) {
         isMenuOpen = false
-        reloadMenu()
+//        reloadMenu()
     }
 }

@@ -15,6 +15,7 @@
 		7DADF8761F347F0200BB0DF2 /* AudioDeviceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DADF8741F347F0200BB0DF2 /* AudioDeviceController.swift */; };
 		7DB6A5CA1F37081700149D6D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7DB6A5C91F37081700149D6D /* Main.storyboard */; };
 		7DB6A5D11F37090100149D6D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7DB6A5D31F37090100149D6D /* Localizable.strings */; };
+		877363E52371957000A0594B /* no_album_art.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 877363E42371957000A0594B /* no_album_art.jpg */; };
 		87FEEB772343A27200C20CEE /* airpods_battery.sh in Resources */ = {isa = PBXBuildFile; fileRef = 87FEEB762343A27200C20CEE /* airpods_battery.sh */; };
 		D51ABA3F20921DE7002F53C9 /* audiodevice in Resources */ = {isa = PBXBuildFile; fileRef = D51ABA3E20921DE6002F53C9 /* audiodevice */; };
 /* End PBXBuildFile section */
@@ -42,6 +43,7 @@
 		7DADF8741F347F0200BB0DF2 /* AudioDeviceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioDeviceController.swift; sourceTree = "<group>"; };
 		7DB6A5C91F37081700149D6D /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		7DB6A5D21F37090100149D6D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		877363E42371957000A0594B /* no_album_art.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = no_album_art.jpg; sourceTree = "<group>"; };
 		87FEEB762343A27200C20CEE /* airpods_battery.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = airpods_battery.sh; sourceTree = "<group>"; };
 		D51ABA3E20921DE6002F53C9 /* audiodevice */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = audiodevice; sourceTree = "<group>"; };
 		D56B3409215B7B0600EFACA1 /* AudioDevice2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AudioDevice2.entitlements; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 		7DADF86D1F347E8E00BB0DF2 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				877363E42371957000A0594B /* no_album_art.jpg */,
 				87FEEB762343A27200C20CEE /* airpods_battery.sh */,
 				D51ABA3E20921DE6002F53C9 /* audiodevice */,
 				7DB6A5D31F37090100149D6D /* Localizable.strings */,
@@ -186,6 +189,7 @@
 				D51ABA3F20921DE7002F53C9 /* audiodevice in Resources */,
 				87FEEB772343A27200C20CEE /* airpods_battery.sh in Resources */,
 				7DB6A5D11F37090100149D6D /* Localizable.strings in Resources */,
+				877363E52371957000A0594B /* no_album_art.jpg in Resources */,
 				7DADF8631F347E8200BB0DF2 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
