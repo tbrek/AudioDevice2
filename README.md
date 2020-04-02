@@ -2,7 +2,7 @@
 
 Download latest version from [here][download]
 
-How many times have you play music trough you speakers instead of headphones?
+How many times have you played Jason Donovan trough your speakers instead of headphones embarrassing yourself?
 
 This comes as a little helper. It's small menu bar application which shows current output device.
 
