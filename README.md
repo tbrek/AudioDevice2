@@ -39,12 +39,12 @@ Preferences menu:
 
 ##### Version 2.4.6:
 
-* Added cover view and ability to play/pause and skip song for iTunes and Spotify
+* Added cover view and ability to play/pause and skip songs in iTunes and Spotify
 * Added AirPods support to display battery status
 
 ##### Version 2.4.0:
 
-* Mojave compatibility update. **Please allow AudioDevice2 to control iTunes/Spotify one the first start**
+* Mojave compatibility update. **Please allow AudioDevice2 to control iTunes/Spotify on the first start**
 
 ##### Version 2.3.9:
 
