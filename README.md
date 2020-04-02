@@ -15,6 +15,8 @@ After re-writing the app from the scratch it become replacement for macOS' volum
 5. Show/hide input device
 6. Show/hide output device
 7. Autopause Spotify/iTunes when screen is locked/unlocked
+8. Display and control Spotify i Tunes
+9. Display Airpods battery level.
 
 When display names are too long and take too much space you can `use short names` option from app's preferences.
 
@@ -43,8 +45,6 @@ Preferences menu:
 ##### Version 2.4.0:
 
 * Mojave compatibility update. **Please allow AudioDevice2 to control iTunes/Spotify one the first start**
-
-![security]
 
 ##### Version 2.3.9:
 
@@ -98,6 +98,5 @@ The [MIT License](LICENSE).
 [menu]: /images/menu.png
 [preferences]: /images/preferences.png
 [appdemo]: /images/appdemo.gif
-[security]: /images/security.png
 [download]: https://github.com/tbrek/AudioDevice2/releases/latest
 
