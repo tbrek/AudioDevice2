@@ -31,7 +31,7 @@
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Please give AudioDevice2 access to Spotify/iTunes via Apple Script.</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2018 Tom Brek. All rights reserved.</string>
+	<string>Copyright © 2020 Tom Brek. All rights reserved.</string>
 	<key>NSMainStoryboardFile</key>
 	<string>Main</string>
 	<key>NSPrincipalClass</key>

@@ -218,7 +218,7 @@ class AudioDeviceController: NSObject {
         command = "tell application \"Spotify\" to set image_data to artwork url of current track"
         commandObject = NSAppleScript(source: command)
         currentArtworkImage = commandObject!.executeAndReturnError(&error)
-        let notHTTPS = currentArtworkImage.stringValue ?? ""
+        let notHTTPS = currentArtworkImage?.stringValue ?? "http"
         let artworkURL = notHTTPS.replacingOccurrences(of: "http:", with: "https:")
         let imagePath = URL(string: artworkURL)!
         if let data = NSData(contentsOf: imagePath)  {
@@ -226,25 +226,25 @@ class AudioDeviceController: NSObject {
             artCoverView.image = tempImage
         }
         
-        let nowPlayingTitleShort = (currentTrackTitle!.stringValue ?? "").prefix(25)
-        let nowPlayingArtistShort = (currentTrackArtist!.stringValue ?? "").prefix(25)
+        let nowPlayingTitleShort: Substring? = (currentTrackTitle?.stringValue ?? "").prefix(25)
+        let nowPlayingArtistShort: Substring? = (currentTrackArtist?.stringValue ?? "").prefix(25)
 
         
             
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
         paragraphStyle.lineSpacing = 0.5
-        let nowPlayingTitle = NSAttributedString(string: String(nowPlayingTitleShort),
+        let nowPlayingTitle = NSAttributedString(string: String(nowPlayingTitleShort ?? ""),
                                                  attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12),
                                                                NSAttributedString.Key.paragraphStyle: paragraphStyle])
-        let nowPlayingArtist = NSAttributedString(string: String(nowPlayingArtistShort),
+        let nowPlayingArtist = NSAttributedString(string: String(nowPlayingArtistShort ?? ""),
                                                   attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 11),
                                                                 NSAttributedString.Key.paragraphStyle: paragraphStyle,
                                                                 NSAttributedString.Key.foregroundColor: NSColor.gray])
         let combination = NSMutableAttributedString(string: "", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
 //        combination.append(NSMutableAttributedString(string: "   "))
         combination.append(nowPlayingTitle)
-        if (nowPlayingTitleShort.count == 25) {
+        if (nowPlayingTitleShort?.count == 25) {
             combination.append(NSAttributedString(string: "...", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12), NSAttributedString.Key.paragraphStyle: paragraphStyle]))
         }
 
@@ -506,6 +506,7 @@ class AudioDeviceController: NSObject {
             
                 if let output: NSAppleEventDescriptor = scriptObject?.executeAndReturnError(
                         &error) {
+//                    NSLog("Directly from the script: " + output.stringValue!)
                     if output.stringValue != " Not Connected" {
                         if output.stringValue != nil {
                             batteryLevels = output.stringValue
@@ -531,9 +532,16 @@ class AudioDeviceController: NSObject {
                             batteryLevelsMutable.append(rightBatteryAttributed)
                             batteryLevelsMutable.append(NSAttributedString(string: "%", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
                             batteryLevelsMutable.addAttribute(NSAttributedString.Key.font, value: NSFont.systemFont(ofSize: 10), range: NSRange(location: 0, length: batteryLevelsMutable.length))
-    //                        NSLog(batteryLevelsMutable.string)
-                            airpodsBatteryStatus.attributedTitle = batteryLevelsMutable
+//                            NSLog(batteryLevelsMutable.string)
+                            if airPodsConnected == true {
+                                reloadMenu()
+                                airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String("Test"))
+                                //                            airpodsBatteryStatus.attributedTitle = batteryLevelsMutable
+
+                            }
                         }
+                    } else {
+                        batteryLevelsMutable.append(NSAttributedString(string: "Not connected", attributes: [ NSAttributedString.Key.foregroundColor: NSColor.gray]))
                     }
             }
         }
@@ -602,10 +610,11 @@ class AudioDeviceController: NSObject {
     }
     
     @objc func checkifHeadphonesSpeakers() {
+//        NSLog("Current: ", currentOutputDevice)
         if (currentOutputDevice == "Internal Speakers" || currentOutputDevice == "Headphones" || currentOutputDevice == "MacBook Pro Speakers") {
 //            reloadMenu()
         }
-        getBattery()
+//        getBattery()
     }
     
     @objc func updateIcon() {
@@ -674,13 +683,13 @@ class AudioDeviceController: NSObject {
                     item.state = currentOutputDevice == device ? .on : .off
                     return item
                     }())
-                if (device.contains("AirPods") == true) {
-                    airpodsBatteryStatus.title = "airpodsBatteryStatus"
-                    self.menu.addItem(airpodsBatteryStatus)
-                    airPodsConnected = true
-                    getBattery()
-
-                }
+//                if (device.contains("AirPods") == true) {
+//                    airpodsBatteryStatus.title = "airpodsBatteryStatus"
+//                    self.menu.addItem(airpodsBatteryStatus)
+//                    airPodsConnected = true
+//                    getBattery()
+//
+//                }
             }
             self.menu.addItem(NSMenuItem.separator())
             self.menu.addItem(NSMenuItem(title: NSLocalizedString("Input Device:", comment: "")))
