@@ -52,19 +52,33 @@ var useShortNames: Bool!
 var volumeIndicator: String!
 var volume = Float32(-1)
 
-let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 225, height: 19))
-let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 185, height: 19))
+// Volume slider
+let volumeSliderView = NSView(frame: NSRect(x: 0, y: 0, width: 230, height: 25))
+let volumeSlider = NSSlider(frame: NSRect(x: 20, y: 0, width: 200, height: 25))
 let volumeItem = NSMenuItem()
-var middle = 112
-let mediaControlPreviousButton       = NSButton(frame: NSRect(x: 67, y: 0, width: 19, height: 19))
-let mediaControlPlayPauseButton      = NSButton(frame: NSRect(x: 107, y: 0, width: 19, height: 19))
-let mediaControlNextButton           = NSButton(frame: NSRect(x: 148, y: 0, width: 19, height: 19))
-var mediaControlsView                = NSView(frame: NSRect(x: 0, y: 0, width: 225, height: 19))
-var artCover                         = NSView(frame: NSRect(x: 0, y: 0, width: 225, height: 190))
-var mediaItem = NSMenuItem()
-var nowPlaying = NSMenuItem(title: "  ", action: nil)
-var artCoverItem = NSMenuItem()
-var artCoverView                     = NSImageView(frame: NSRect(x: 25, y: 5, width: 175, height: 175))
+
+// Media controls
+let mediaControlsView = NSView(frame: NSRect(x: 0, y: 0, width: 230, height: 19))
+let previousButton = NSButton(frame: NSRect(x: 70, y: 0, width: 30, height: 19))
+let nextButton = NSButton(frame: NSRect(x: 150, y: 0, width: 30, height: 19))
+let playButton = NSButton(frame: NSRect(x: 110, y: 0, width: 30, height: 19))
+let greyButton = [NSAttributedString.Key.foregroundColor: NSColor.gray]
+let whiteButton = [NSAttributedString.Key.foregroundColor: NSColor.white]
+let previousButtonTitle = NSAttributedString(string: String("􀊊"), attributes: greyButton)
+let previousButtonAltTitle = NSAttributedString(string: String("􀊊"), attributes: whiteButton )
+let playButtonTitle = NSAttributedString(string: String("􀊄"), attributes: greyButton)
+let playButtonAltTitle = NSAttributedString(string: String("􀊄"), attributes: whiteButton)
+let pauseButtonTitle = NSAttributedString(string: String("􀊆"), attributes: greyButton)
+let pauseButtonAltTitle = NSAttributedString(string: String("􀊆"), attributes: whiteButton)
+let nextButtonTitle = NSAttributedString(string: String("􀊌"), attributes: greyButton)
+let nextBUttonAltTitle = NSAttributedString(string: String("􀊌"), attributes: whiteButton )
+let mediaControlsItem = NSMenuItem()
+
+// Covert Art
+let artCover  = NSView(frame: NSRect(x: 0, y: 0, width: 230, height: 190))
+let nowPlaying = NSMenuItem(title: "  ", action: nil)
+let artCoverItem = NSMenuItem()
+let artCoverView  = NSImageView(frame: NSRect(x: 32, y: 5, width: 175, height: 175))
 
 var airpodsBatteryStatus = NSMenuItem()
 
@@ -120,24 +134,40 @@ class AudioDeviceController: NSObject {
         
         volumeSlider.target = self
         volumeSlider.action = #selector(setDeviceVolume(slider:))
-        // Setting up media view
-        mediaControlPreviousButton.image = NSImage(named: "Previous")
-        mediaControlPreviousButton.target = self
-        mediaControlPreviousButton.action = #selector(previous)
-        mediaControlPreviousButton.isBordered = false
-        mediaControlsView.addSubview(mediaControlPreviousButton)
-        mediaControlPlayPauseButton.image = NSImage(named: "Play")
-        mediaControlPlayPauseButton.target = self
-        mediaControlPlayPauseButton.action = #selector(playPause)
-        mediaControlPlayPauseButton.isBordered = false
-        mediaControlsView.addSubview(mediaControlPlayPauseButton)
-        mediaControlNextButton.image = NSImage(named: "Next")
-        mediaControlNextButton.target = self
-        mediaControlNextButton.action = #selector(next)
-        mediaControlNextButton.isBordered = false
-        mediaControlsView.addSubview(mediaControlNextButton)
-        mediaItem.view = mediaControlsView
+
+     
         
+        
+        
+        previousButton.wantsLayer = true
+        previousButton.isBordered = false
+        previousButton.attributedTitle = previousButtonTitle
+        previousButton.attributedAlternateTitle = previousButtonAltTitle
+        previousButton.setButtonType(NSButton.ButtonType.momentaryChange)
+        previousButton.action = #selector(previous)
+        previousButton.target = self
+        
+        nextButton.wantsLayer = true
+        nextButton.isBordered = false
+        nextButton.attributedTitle = nextButtonTitle
+        nextButton.attributedAlternateTitle = nextBUttonAltTitle
+        nextButton.setButtonType(NSButton.ButtonType.momentaryChange)
+        nextButton.action = #selector(next)
+        nextButton.target = self
+        
+        playButton.wantsLayer = true
+        playButton.isBordered = false
+        playButton.attributedTitle = playButtonTitle
+        playButton.attributedAlternateTitle = playButtonAltTitle
+        playButton.setButtonType(NSButton.ButtonType.momentaryChange)
+        playButton.action = #selector(playPause)
+        playButton.target = self
+        
+        
+        mediaControlsView.addSubview(previousButton)
+        mediaControlsView.addSubview(playButton)
+        mediaControlsView.addSubview(nextButton)
+        mediaControlsItem.view = mediaControlsView
 
         
         artCoverView.image = NSImage(named: "Art")
@@ -200,10 +230,12 @@ class AudioDeviceController: NSObject {
     @objc func playPause() {
         checkPlayers()
         if (isSpotifyPlaying == true) {
-            mediaControlPlayPauseButton.image = NSImage(named: "Pause")
+            playButton.attributedTitle = pauseButtonTitle
+            playButton.attributedAlternateTitle = pauseButtonAltTitle
             pausePlayers()
         } else {
-            mediaControlPlayPauseButton.image = NSImage(named: "Play")
+            playButton.attributedTitle = playButtonTitle
+            playButton.attributedAlternateTitle = playButtonAltTitle
             resumePlayers()
         }
     }
@@ -228,9 +260,6 @@ class AudioDeviceController: NSObject {
         
         let nowPlayingTitleShort: Substring? = (currentTrackTitle?.stringValue ?? "").prefix(25)
         let nowPlayingArtistShort: Substring? = (currentTrackArtist?.stringValue ?? "").prefix(25)
-
-        
-            
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
         paragraphStyle.lineSpacing = 0.5
@@ -242,19 +271,15 @@ class AudioDeviceController: NSObject {
                                                                 NSAttributedString.Key.paragraphStyle: paragraphStyle,
                                                                 NSAttributedString.Key.foregroundColor: NSColor.gray])
         let combination = NSMutableAttributedString(string: "", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
-//        combination.append(NSMutableAttributedString(string: "   "))
         combination.append(nowPlayingTitle)
         if (nowPlayingTitleShort?.count == 25) {
             combination.append(NSAttributedString(string: "...", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12), NSAttributedString.Key.paragraphStyle: paragraphStyle]))
         }
 
         combination.append(NSAttributedString(string: "\n", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 1), NSAttributedString.Key.paragraphStyle: paragraphStyle]))
-//        combination.append(NSMutableAttributedString(string: "   "))
         combination.append(nowPlayingArtist)
-//        combination.append(NSAttributedString(string: "\n", attributes: [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 6)]))
         nowPlaying.attributedTitle = combination
         nowPlaying.isEnabled = true
-
     }
     
     @objc func next() {
@@ -262,45 +287,57 @@ class AudioDeviceController: NSObject {
             command = "if application \"Spotify\" is running then tell application \"Spotify\" to next track"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
-            mediaControlPlayPauseButton.image = NSImage(named: "Pause")
             command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
             commandObject = NSAppleScript(source: command)
             spotifyStatus = commandObject!.executeAndReturnError(&error)
+            playButton.attributedTitle = pauseButtonTitle
+            playButton.attributedAlternateTitle = pauseButtonAltTitle
             refreshNowPlaying()
+            refreshNowPlaying()
+
         }
         
         if (isiTunesRunning == true) {
             command = "if application \"iTunes\" is running then tell application \"iTunes\" to next track"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
-            mediaControlPlayPauseButton.image = NSImage(named: "Pause")
             command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
             commandObject = NSAppleScript(source: command)
             iTunesStatus = commandObject!.executeAndReturnError(&error)
+            playButton.attributedTitle = pauseButtonTitle
+            playButton.attributedAlternateTitle = pauseButtonAltTitle
             refreshNowPlaying()
+            refreshNowPlaying()
+
         }
     }
     
     @objc func previous() {
+        NSLog("Previous")
+        previousButton.isEnabled = true
         if (isSpotifyRunning == true) {
             command = "if application \"Spotify\" is running then tell application \"Spotify\" to previous track"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
-            mediaControlPlayPauseButton.image = NSImage(named: "Pause")
             command = "tell application \"Spotify\" to set spotifyState to (player state as text)"
             commandObject = NSAppleScript(source: command)
             spotifyStatus = commandObject!.executeAndReturnError(&error)
+            playButton.attributedTitle = pauseButtonTitle
+            playButton.attributedAlternateTitle = pauseButtonAltTitle
+            refreshNowPlaying()
             refreshNowPlaying()
         }
-        
+
         if (isiTunesRunning == true) {
             command = "if application \"iTunes\" is running then tell application \"iTunes\" to previous track"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
-            mediaControlPlayPauseButton.image = NSImage(named: "Pause")
             command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
             commandObject = NSAppleScript(source: command)
             iTunesStatus = commandObject!.executeAndReturnError(&error)
+            playButton.attributedTitle = pauseButtonTitle
+            playButton.attributedAlternateTitle = pauseButtonAltTitle
+            refreshNowPlaying()
             refreshNowPlaying()
         }
     }
@@ -326,12 +363,13 @@ class AudioDeviceController: NSObject {
                     commandObject = NSAppleScript(source: command)
                     spotifyStatus = commandObject!.executeAndReturnError(&error)
                     if (spotifyStatus?.stringValue == "playing") {
-                        mediaControlPlayPauseButton.image = NSImage(named: "Pause")
+                        playButton.attributedTitle = pauseButtonTitle
+                        playButton.attributedAlternateTitle = pauseButtonAltTitle
                         nowPlaying.isEnabled = true
                         isSpotifyPlaying = true
-                        
                     } else {
-                        mediaControlPlayPauseButton.image = NSImage(named: "Play")
+                        playButton.attributedTitle = playButtonTitle
+                        playButton.attributedAlternateTitle = playButtonAltTitle
                         isSpotifyPlaying = false
                     }
                     refreshNowPlaying()
@@ -343,10 +381,12 @@ class AudioDeviceController: NSObject {
                     commandObject = NSAppleScript(source: command)
                     iTunesStatus = commandObject!.executeAndReturnError(&error)
                     if (iTunesStatus?.stringValue == "playing") {
-                        mediaControlPlayPauseButton.image = NSImage(named: "Pause")
+                        playButton.attributedTitle = pauseButtonTitle
+                        playButton.attributedAlternateTitle = pauseButtonAltTitle
                         nowPlaying.isEnabled = true
                     } else {
-                        mediaControlPlayPauseButton.image = NSImage(named: "Play")
+                        playButton.attributedTitle = playButtonTitle
+                        playButton.attributedAlternateTitle = playButtonAltTitle
                         isiTunesPlaying = false
                     }
                 }
@@ -358,7 +398,8 @@ class AudioDeviceController: NSObject {
             command = "if application \"Spotify\" is running then tell application \"Spotify\" to play"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
-            mediaControlPlayPauseButton.image = NSImage(named: "Pause")
+            playButton.attributedTitle = pauseButtonTitle
+            playButton.attributedAlternateTitle = pauseButtonAltTitle
             isSpotifyPlaying = true
         }
         
@@ -366,8 +407,8 @@ class AudioDeviceController: NSObject {
             command = "if application \"iTunes\" is running then tell application \"iTunes\" to play"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
-            mediaControlPlayPauseButton.image = NSImage(named: "Pause")
-
+            playButton.attributedTitle = pauseButtonTitle
+            playButton.attributedAlternateTitle = pauseButtonAltTitle
             isiTunesPlaying = true
         }
     }
@@ -378,7 +419,8 @@ class AudioDeviceController: NSObject {
             command = "if application \"Spotify\" is running then tell application \"Spotify\" to pause"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
-            mediaControlPlayPauseButton.image = NSImage(named: "Play")
+            playButton.attributedTitle = playButtonTitle
+            playButton.attributedAlternateTitle = playButtonAltTitle
             isSpotifyPlaying = false
         }
         
@@ -386,7 +428,8 @@ class AudioDeviceController: NSObject {
             command = "if application \"iTunes\" is running then tell application \"iTunes\" to pause"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
-            mediaControlPlayPauseButton.image = NSImage(named: "Play")
+            playButton.attributedTitle = playButtonTitle
+            playButton.attributedAlternateTitle = playButtonAltTitle
             isiTunesPlaying = false
         }
     }
@@ -405,7 +448,8 @@ class AudioDeviceController: NSObject {
             let commandObject = NSAppleScript(source: command)
             var error: NSDictionary?
             commandObject!.executeAndReturnError(&error)
-            mediaControlPlayPauseButton.image = NSImage(named: "Pause")
+            playButton.attributedTitle = pauseButtonTitle
+            playButton.attributedAlternateTitle = pauseButtonAltTitle
         }
         
         if (iTunesStatus?.stringValue == "playing") {
@@ -413,7 +457,9 @@ class AudioDeviceController: NSObject {
             let commandObject = NSAppleScript(source: command)
             var error: NSDictionary?
             commandObject!.executeAndReturnError(&error)
-            mediaControlPlayPauseButton.image = NSImage(named: "Play")
+            playButton.attributedTitle = playButtonTitle
+            playButton.attributedAlternateTitle = playButtonAltTitle
+            
         }
     }
 
@@ -425,7 +471,7 @@ class AudioDeviceController: NSObject {
         }()
         self.statusItem = {
             let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-            item.target = self
+            item.button?.target = self
             item.menu = self.menu
             return item
         }()
@@ -506,7 +552,6 @@ class AudioDeviceController: NSObject {
             
                 if let output: NSAppleEventDescriptor = scriptObject?.executeAndReturnError(
                         &error) {
-//                    NSLog("Directly from the script: " + output.stringValue!)
                     if output.stringValue != " Not Connected" {
                         if output.stringValue != nil {
                             batteryLevels = output.stringValue
@@ -532,7 +577,6 @@ class AudioDeviceController: NSObject {
                             batteryLevelsMutable.append(rightBatteryAttributed)
                             batteryLevelsMutable.append(NSAttributedString(string: "%", attributes: [ NSAttributedString.Key.foregroundColor: colorRight ?? NSColor.gray]))
                             batteryLevelsMutable.addAttribute(NSAttributedString.Key.font, value: NSFont.systemFont(ofSize: 10), range: NSRange(location: 0, length: batteryLevelsMutable.length))
-//                            NSLog(batteryLevelsMutable.string)
                             if airPodsConnected == true {
                                 reloadMenu()
                                 airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String("Test"))
@@ -545,7 +589,6 @@ class AudioDeviceController: NSObject {
                     }
             }
         }
-//        airpodsBatteryStatus.attributedTitle = NSAttributedString(string: String(batteryLevels + "%"), attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: NSColor.gray])
         
     }
     
@@ -588,23 +631,19 @@ class AudioDeviceController: NSObject {
         }
         
         if (showOutputDevice == true) && (showInputDevice == true) {
-            trimmed1 = trimmed1 + "\n"
-            let outputDevice = NSAttributedString(string: trimmed1, attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 7)])
-            let inputDevice = NSAttributedString(string: trimmed2, attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 7)])
-            let combination = NSMutableAttributedString()
-            combination.append(outputDevice)
-            combination.append(inputDevice)
-            self.statusItem.attributedTitle = combination
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.maximumLineHeight = 8
+            self.statusItem.button?.attributedTitle = NSMutableAttributedString(string: " " + trimmed1 + "\n " + trimmed2, attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 8), NSAttributedString.Key.baselineOffset: -3, NSAttributedString.Key.paragraphStyle: paragraphStyle])
             
         }
         if (showOutputDevice == true) && (showInputDevice == false) {
-            self.statusItem.title = trimmed1
+            self.statusItem.button?.title = trimmed1
         }
         if (showOutputDevice == false) && (showInputDevice == true) {
-            self.statusItem.title = trimmed2
+            self.statusItem.button?.title = trimmed2
         }
         if (showOutputDevice == false) && (showInputDevice == false) {
-            self.statusItem.title = ""
+            self.statusItem.button?.title = ""
         }
         updateIcon()
     }
@@ -650,6 +689,7 @@ class AudioDeviceController: NSObject {
         default:
             iconName = "Default"
         }
+        
         statusItem.image = NSImage(named: iconName + volumeIndicator)
     }
     
@@ -669,9 +709,20 @@ class AudioDeviceController: NSObject {
             getInputs()
             getOutputs()
             self.menu.removeAllItems()
-            self.menu.addItem(NSMenuItem(title: "Volume:", target:self))
+            
+            // Adding dummy view to set fixed size
+            let dummyItem = NSMenuItem()
+            dummyItem.view = NSView(frame: NSRect(x: 0, y: 0, width: 230, height: 0))
+            self.menu.addItem(dummyItem)
+            
+            let soundItem = NSMenuItem()
+            soundItem.attributedTitle = NSAttributedString(string: "Sound", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12, weight: NSFont.Weight.bold)])
+            self.menu.addItem(soundItem)
             self.menu.addItem(volumeItem)
-            self.menu.addItem(NSMenuItem(title: NSLocalizedString("Output Device:", comment: "")))
+            self.menu.addItem(NSMenuItem.separator())
+            let outputItem = NSMenuItem()
+            outputItem.attributedTitle = NSAttributedString(string: "Output", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12, weight: NSFont.Weight.bold)])
+            self.menu.addItem(outputItem)
             outputsArray.forEach { device in
                 self.menu.addItem({
                     outputDeviceName = NSAttributedString(string: "")
@@ -679,7 +730,7 @@ class AudioDeviceController: NSObject {
                     } else {
                         outputDeviceName = NSAttributedString(string: device)
                     }
-                    let item = NSMenuItem(title: device, target: self, action: #selector(selectOutputDeviceActions(_ :)))
+                    let item = NSMenuItem(title: String(Substring(device).prefix(25)), target: self, action: #selector(selectOutputDeviceActions(_ :)))
                     item.state = currentOutputDevice == device ? .on : .off
                     return item
                     }())
@@ -691,11 +742,17 @@ class AudioDeviceController: NSObject {
 //
 //                }
             }
+            
             self.menu.addItem(NSMenuItem.separator())
-            self.menu.addItem(NSMenuItem(title: NSLocalizedString("Input Device:", comment: "")))
+            
+            let inputItem = NSMenuItem()
+            inputItem.attributedTitle = NSAttributedString(string: "Output", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12, weight: NSFont.Weight.bold)])
+            self.menu.addItem(inputItem)
+            
+//            Adding input devices
             inputsArray.forEach { device in
                 self.menu.addItem({
-                    let item = NSMenuItem(title: device, target: self, action: #selector(selectInputDeviceAction(_:)))
+                    let item = NSMenuItem(title: String(Substring(device).prefix(25)), target: self, action: #selector(selectInputDeviceAction(_:)))
                     item.state = currentInputDevice == device ? .on : .off
                     return item
                     }())
@@ -703,24 +760,21 @@ class AudioDeviceController: NSObject {
             self.menu.addItem(NSMenuItem.separator())
         
 
-            let nowPlayingHeader = NSMenuItem(title: "", action:nil)
-            nowPlayingHeader.attributedTitle = NSAttributedString(string: "Now playing:", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
+            let nowPlayingHeader = NSMenuItem()
+            nowPlayingHeader.attributedTitle = NSAttributedString(string: "Now playing", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12, weight: NSFont.Weight.bold)])
             self.menu.addItem(nowPlayingHeader)
             
             self.menu.addItem(artCoverItem)
             self.menu.addItem(nowPlaying)
             nowPlaying.action = #selector(bringPlayerToFrom)
             nowPlaying.target = self
+           
+          
+            self.menu.addItem(mediaControlsItem)
             
-            self.menu.addItem(mediaItem)
             
             nowPlaying.attributedTitle = NSAttributedString(string: "", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
-        // Create media controls\
-
-//        mediaControlsView.setFrameSize(NSSize(width: 200, height: 19))
       
-            
-            
             self.menu.addItem(NSMenuItem.separator())
             
             self.menu.addItem(NSMenuItem(title: "Sound Preferences...", target: self, action: #selector(openSoundPreferences(_:))))
@@ -730,12 +784,6 @@ class AudioDeviceController: NSObject {
             self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
             menu.item(withTitle: "Quit")?.isHidden = true
             menu.item(withTitle: "Preferences...")?.isHidden = true
-
-        // Reisze volumeSliderView & volumeSlider if needed
-//        volumeSliderView.setFrameSize(NSSize(width: 200, height: 19))
-//        NSLog("Menu %f", menu.size.width)
-//        volumeSlider.setFrameSize(NSSize(width: 160, height: 19))
-        
             updateMenu()
         }
     }
@@ -941,15 +989,15 @@ extension AudioDeviceController: NSMenuDelegate {
                                                      attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12),
                                                                    NSAttributedString.Key.paragraphStyle: paragraphStyle])
             nowPlaying.attributedTitle = noPlayingTitle
-            mediaControlPlayPauseButton.isEnabled = false
-            mediaControlNextButton.isEnabled = false
-            mediaControlPreviousButton.isEnabled = false
+            playButton.isEnabled = false
+            previousButton.isEnabled = false
+            nextButton.isEnabled = false
             artCoverView.image = NSImage(named: "Art")
 
         } else {
-            mediaControlPlayPauseButton.isEnabled = true
-            mediaControlNextButton.isEnabled = true
-            mediaControlPreviousButton.isEnabled = true
+            playButton.isEnabled = true
+            previousButton.isEnabled = true
+            nextButton.isEnabled = true
         }
         checkPlayers()
         getDeviceVolume()
