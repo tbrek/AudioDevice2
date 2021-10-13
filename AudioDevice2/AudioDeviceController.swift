@@ -710,7 +710,7 @@ class AudioDeviceController: NSObject {
             getOutputs()
             self.menu.removeAllItems()
             
-//            Adding dummy view to set fixed size
+            // Adding dummy view to set fixed size
             let dummyItem = NSMenuItem()
             dummyItem.view = NSView(frame: NSRect(x: 0, y: 0, width: 230, height: 0))
             self.menu.addItem(dummyItem)
@@ -774,10 +774,7 @@ class AudioDeviceController: NSObject {
             
             
             nowPlaying.attributedTitle = NSAttributedString(string: "", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12)])
-
       
-            
-            
             self.menu.addItem(NSMenuItem.separator())
             
             self.menu.addItem(NSMenuItem(title: "Sound Preferences...", target: self, action: #selector(openSoundPreferences(_:))))
@@ -787,7 +784,6 @@ class AudioDeviceController: NSObject {
             self.menu.addItem(NSMenuItem(title: NSLocalizedString("Quit", comment: ""), target: self, action: #selector(quitAction(_:)), keyEquivalent: "q"))
             menu.item(withTitle: "Quit")?.isHidden = true
             menu.item(withTitle: "Preferences...")?.isHidden = true
-        
             updateMenu()
         }
     }
