@@ -721,8 +721,11 @@ class AudioDeviceController: NSObject {
             self.menu.addItem(volumeItem)
             self.menu.addItem(NSMenuItem.separator())
             let outputItem = NSMenuItem()
+            
             outputItem.attributedTitle = NSAttributedString(string: "Output", attributes: [ NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12, weight: NSFont.Weight.bold)])
             self.menu.addItem(outputItem)
+            
+            // Add output devices
             outputsArray.forEach { device in
                 self.menu.addItem({
                     outputDeviceName = NSAttributedString(string: "")
@@ -731,7 +734,22 @@ class AudioDeviceController: NSObject {
                         outputDeviceName = NSAttributedString(string: device)
                     }
                     let item = NSMenuItem(title: String(Substring(device).prefix(25)), target: self, action: #selector(selectOutputDeviceActions(_ :)))
-                    item.state = currentOutputDevice == device ? .on : .off
+                    // Adding icon
+                    switch device {
+                    case "Airpods":
+                        iconName =  "Airpods"
+                    case "Internal Speakers", "MacBook Pro Speakers":
+                        iconName =  "MacBook Pro Speakers"
+                    case "Display Audio":
+                        iconName = "Display"
+                    case "Headphones":
+                        iconName = "Headphones"
+                    default:
+                        iconName = "Default"
+                    }
+                    
+                    item.image = currentOutputDevice == device ? NSImage(named: iconName + "_Active") : NSImage(named: iconName + "_Inactive")
+//                    item.image?.size = NSSize(width: 26, height: 26)
                     return item
                     }())
 //                if (device.contains("AirPods") == true) {
@@ -753,7 +771,25 @@ class AudioDeviceController: NSObject {
             inputsArray.forEach { device in
                 self.menu.addItem({
                     let item = NSMenuItem(title: String(Substring(device).prefix(25)), target: self, action: #selector(selectInputDeviceAction(_:)))
-                    item.state = currentInputDevice == device ? .on : .off
+                    
+                    // Adding icon
+                    
+                    switch device {
+                    case "Airpods":
+                        iconName =  "Airpods"
+                    case "Internal Microphone", "MacBook Pro Microphone":
+                        iconName =  "MacBook Pro Speakers"
+                    case "Display Audio":
+                        iconName = "Display"
+                    case "Headphones":
+                        iconName = "Headphones"
+                    default:
+                        iconName = "Microphone"
+                    }
+                    
+                    item.image = currentInputDevice == device ? NSImage(named: iconName + "_Active") : NSImage(named: iconName + "_Inactive")
+                    item.image?.size = NSSize(width: 26, height: 26)
+                    
                     return item
                     }())
             }
