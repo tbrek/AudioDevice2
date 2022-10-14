@@ -3,6 +3,7 @@
 //
 
 import Cocoa
+import Combine
 import CoreServices
 import CoreAudio
 import CoreImage
@@ -102,6 +103,7 @@ class AudioDeviceController: NSObject {
     private weak var autoPauseOnOutputChangeCheck: NSButton!
     private weak var buttonPayPal: NSButton!
     private weak var labelVersion: NSTextField!
+    private var subscriptions: Set<AnyCancellable> = []
     
     override init() {
         isMenuOpen = false
@@ -201,9 +203,15 @@ class AudioDeviceController: NSObject {
         self.setupItems()
 //        timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
 //        timer2 = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(checkifHeadphonesSpeakers), userInfo: nil, repeats: true)
-        NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioDevicesDidChange)
-        NotificationCenter.addObserver(observer: self, selector: #selector(outputChanged), name: .audioOutputDeviceDidChange)
-        NotificationCenter.addObserver(observer: self, selector: #selector(reloadMenu), name: .audioInputDeviceDidChange)
+        NotificationCenter.addObserver(name: .audioDevicesDidChange).sink { [weak self] notification in
+            self?.reloadMenu()
+        }.store(in: &subscriptions)
+        NotificationCenter.addObserver(name: .audioOutputDeviceDidChange).sink { [weak self] notification in
+            self?.outputChanged()
+        }.store(in: &subscriptions)
+        NotificationCenter.addObserver(name: .audioInputDeviceDidChange).sink { [weak self] notification in
+            self?.reloadMenu()
+        }.store(in: &subscriptions)
         let center = DistributedNotificationCenter.default()
         center.addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name(rawValue: "com.apple.screenIsLocked"), object: nil)
         center.addObserver(self, selector: #selector(screenUnlocked), name: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"), object: nil)
@@ -215,9 +223,6 @@ class AudioDeviceController: NSObject {
     }
 
     deinit {
-        NotificationCenter.removeObserver(observer: self, name: .audioDevicesDidChange)
-        NotificationCenter.removeObserver(observer: self, name: .audioOutputDeviceDidChange)
-        NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
         let center = DistributedNotificationCenter.default()
         center.removeObserver(self, forKeyPath: NSNotification.Name(rawValue: "com.apple.screenIsLocked").rawValue)
         center.removeObserver(self, forKeyPath: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked").rawValue)
@@ -342,12 +347,12 @@ class AudioDeviceController: NSObject {
         }
     }
     
-    @objc func outputChanged() {
-    if (autoPauseOnOutputChange == true) {
-        checkPlayers()
-        pausePlayers()
-    }
-    reloadMenu()
+    private func outputChanged() {
+        if (autoPauseOnOutputChange == true) {
+            checkPlayers()
+            pausePlayers()
+        }
+        reloadMenu()
     }
     
     @objc func checkPlayers() {
@@ -702,7 +707,7 @@ class AudioDeviceController: NSObject {
         }
     }
     
-    @objc func reloadMenu() {
+    private func reloadMenu() {
         if isMenuOpen == false {
             getCurrentInput()
             getCurrentOutput()

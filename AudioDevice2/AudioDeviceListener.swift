@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import Combine
 import CoreServices
 import CoreAudio
 import AudioToolbox
@@ -72,18 +73,19 @@ struct AudioListener {
 
 class AudioDeviceListener {
     static let shared = AudioDeviceListener()
+    private var subscriptions: Set<AnyCancellable> = []
     
     // MARK: Lifecycle
     init() {
-        NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioDevicesDidChange)
-        NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioOutputDeviceDidChange)
-        NotificationCenter.addObserver(observer: self, selector: #selector(handleNotification(_:)), name: .audioInputDeviceDidChange)
-    }
-
-    deinit {
-        NotificationCenter.removeObserver(observer: self, name: .audioDevicesDidChange)
-        NotificationCenter.removeObserver(observer: self, name: .audioOutputDeviceDidChange)
-        NotificationCenter.removeObserver(observer: self, name: .audioInputDeviceDidChange)
+        NotificationCenter.addObserver(name: .audioDevicesDidChange).sink { [weak self] notification in
+            self?.handleNotification(notification)
+        }.store(in: &subscriptions)
+        NotificationCenter.addObserver(name: .audioOutputDeviceDidChange).sink { [weak self] notification in
+            self?.handleNotification(notification)
+        }.store(in: &subscriptions)
+        NotificationCenter.addObserver(name: .audioInputDeviceDidChange).sink { [weak self] notification in
+            self?.handleNotification(notification)
+        }.store(in: &subscriptions)
     }
 
     // MARK: Public method
@@ -100,7 +102,7 @@ class AudioDeviceListener {
     }
 
     // MARK: Notification handler
-    @objc private func handleNotification(_ notification: Notification) {
+    private func handleNotification(_ notification: Notification) {
         if notification.name == AudioDeviceNotification.audioDevicesDidChange.notificationName {
         } else if notification.name == AudioDeviceNotification.audioOutputDeviceDidChange.notificationName {
         } else if notification.name == AudioDeviceNotification.audioInputDeviceDidChange.notificationName {
