@@ -129,16 +129,11 @@ class AudioDeviceController: NSObject {
         volumeItem.view = volumeSliderView
         volumeSlider.isContinuous = true
         
-        
         super.init()
         
         volumeSlider.target = self
         volumeSlider.action = #selector(setDeviceVolume(slider:))
 
-     
-        
-        
-        
         previousButton.wantsLayer = true
         previousButton.isBordered = false
         previousButton.attributedTitle = previousButtonTitle
@@ -163,19 +158,16 @@ class AudioDeviceController: NSObject {
         playButton.action = #selector(playPause)
         playButton.target = self
         
-        
         mediaControlsView.addSubview(previousButton)
         mediaControlsView.addSubview(playButton)
         mediaControlsView.addSubview(nextButton)
         mediaControlsItem.view = mediaControlsView
 
-        
         artCoverView.image = NSImage(named: "Art")
         
         artCover.addSubview(artCoverView)
         artCoverItem.view = artCover
         artCoverView.imageScaling = .scaleProportionallyUpOrDown
-        
         
         // Audiodevice location
         urlPath = Bundle.main.url(forResource: "audiodevice", withExtension: "")
@@ -209,7 +201,6 @@ class AudioDeviceController: NSObject {
         center.addObserver(self, selector: #selector(screenUnlocked), name: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"), object: nil)
         
         timer1 = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateIcon), userInfo: nil, repeats: true)
-              
         timer2 = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(checkifHeadphonesSpeakers), userInfo: nil, repeats: true)
         
     }
@@ -225,8 +216,6 @@ class AudioDeviceController: NSObject {
         timer2.invalidate()
     }
         
-
-    
     @objc func playPause() {
         checkPlayers()
         if (isSpotifyPlaying == true) {
@@ -294,21 +283,19 @@ class AudioDeviceController: NSObject {
             playButton.attributedAlternateTitle = pauseButtonAltTitle
             refreshNowPlaying()
             refreshNowPlaying()
-
         }
         
         if (isiTunesRunning == true) {
-            command = "if application \"iTunes\" is running then tell application \"iTunes\" to next track"
+            command = "if application \"Music\" is running then tell application \"Music\" to next track"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
-            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
+            command = "tell application \"Music\" to set iTunesState to (player state as text)"
             commandObject = NSAppleScript(source: command)
             iTunesStatus = commandObject!.executeAndReturnError(&error)
             playButton.attributedTitle = pauseButtonTitle
             playButton.attributedAlternateTitle = pauseButtonAltTitle
             refreshNowPlaying()
             refreshNowPlaying()
-
         }
     }
     
@@ -329,10 +316,10 @@ class AudioDeviceController: NSObject {
         }
 
         if (isiTunesRunning == true) {
-            command = "if application \"iTunes\" is running then tell application \"iTunes\" to previous track"
+            command = "if application \"Music\" is running then tell application \"Music\" to previous track"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
-            command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
+            command = "tell application \"Music\" to set iTunesState to (player state as text)"
             commandObject = NSAppleScript(source: command)
             iTunesStatus = commandObject!.executeAndReturnError(&error)
             playButton.attributedTitle = pauseButtonTitle
@@ -375,9 +362,9 @@ class AudioDeviceController: NSObject {
                     refreshNowPlaying()
                 }
                 
-                if (currentApp.localizedName == "iTunes") {
+                if (currentApp.localizedName == "Music") {
                     isiTunesRunning = true
-                    command = "tell application \"iTunes\" to set iTunesState to (player state as text)"
+                    command = "tell application \"Music\" to set iTunesState to (player state as text)"
                     commandObject = NSAppleScript(source: command)
                     iTunesStatus = commandObject!.executeAndReturnError(&error)
                     if (iTunesStatus?.stringValue == "playing") {
@@ -404,7 +391,7 @@ class AudioDeviceController: NSObject {
         }
         
         if (isiTunesRunning == true) {
-            command = "if application \"iTunes\" is running then tell application \"iTunes\" to play"
+            command = "if application \"Music\" is running then tell application \"Music\" to play"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
             playButton.attributedTitle = pauseButtonTitle
@@ -425,7 +412,7 @@ class AudioDeviceController: NSObject {
         }
         
         if (isiTunesRunning == true) {
-            command = "if application \"iTunes\" is running then tell application \"iTunes\" to pause"
+            command = "if application \"Music\" is running then tell application \"Music\" to pause"
             commandObject = NSAppleScript(source: command)
             commandObject!.executeAndReturnError(&error)
             playButton.attributedTitle = playButtonTitle
@@ -453,7 +440,7 @@ class AudioDeviceController: NSObject {
         }
         
         if (iTunesStatus?.stringValue == "playing") {
-            let command = "if application \"iTunes\" is running then tell application \"iTunes\" to play"
+            let command = "if application \"Music\" is running then tell application \"Music\" to play"
             let commandObject = NSAppleScript(source: command)
             var error: NSDictionary?
             commandObject!.executeAndReturnError(&error)

@@ -29,7 +29,7 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>Please give AudioDevice2 access to Spotify/iTunes via Apple Script.</string>
+	<string>Please give AudioDevice2 access to Spotify/Music via Apple Script.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2020 Tom Brek. All rights reserved.</string>
 	<key>NSMainStoryboardFile</key>
